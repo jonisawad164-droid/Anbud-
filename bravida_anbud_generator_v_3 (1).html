@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bravida Anbud-Generator v3</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    :root{
+      /* Bravida-inspirerad ljus design */
+      --bg:#f3f8fb;--surface:#ffffff;--surface2:#eaf5f8;--surface3:#d7edf3;--border:#c8dce4;
+      --text:#123247;--muted:#5f7482;--soft:#355466;--teal:#7dd4b0;--teal2:#42b894;
+      --blue:#0063a3;--blue2:#003f6b;--lightblue:#cee8ee;--green:#7dd4b0;--gold:#b88700;--danger:#c94747;
+      --paper:#fff;--papertext:#2b2b2b;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',system-ui,sans-serif;background:linear-gradient(180deg,#ffffff 0%,var(--bg) 34%,#eaf5f8 100%);color:var(--text);min-height:100vh}
+    button,input,textarea,select{font-family:inherit}
+    header{height:72px;position:sticky;top:0;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:1rem;padding:0 1.5rem;box-shadow:0 8px 28px rgba(0,63,107,.08)}
+    .mark{width:34px;height:34px;flex:0 0 auto}.brand-logo-img{height:38px;width:auto;display:block;object-fit:contain;flex:0 0 auto}.brand{font-family:'Syne';font-weight:800;letter-spacing:.04em;color:var(--blue2);font-size:1rem;border-left:1px solid var(--border);padding-left:1rem;white-space:nowrap}.brand span{color:var(--blue2)}
+    .badge{margin-left:auto;background:linear-gradient(135deg,var(--teal2),var(--blue));color:#fff;border-radius:999px;padding:.25rem .7rem;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+    .toolbar{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}.mini{padding:.45rem .7rem!important;font-size:.78rem!important}
+    .steps{position:sticky;top:72px;z-index:90;background:rgba(255,255,255,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;padding:0 1.5rem;box-shadow:0 10px 24px rgba(0,63,107,.05)}
+    .step{display:flex;align-items:center;gap:.5rem;color:var(--muted);padding:1rem 1.05rem;white-space:nowrap;cursor:pointer;border-bottom:2px solid transparent;font-size:.86rem;font-weight:600}
+    .step:hover{color:var(--text)}.step.active{color:var(--blue);border-bottom-color:var(--green)}.step.done{color:var(--soft)}
+    .num{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--surface2);border:1px solid var(--border);font-size:.75rem}.step.active .num{background:var(--green);color:var(--blue2);border-color:var(--green)}
+    main{max-width:1180px;margin:0 auto;padding:2rem 1.25rem 4rem}.title{color:var(--blue)}.panel{display:none;animation:fade .22s ease}.panel.active{display:block}@keyframes fade{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}
+    .title{font-family:'Syne';font-size:1.65rem;font-weight:800;margin-bottom:.35rem}.sub{color:var(--muted);margin-bottom:1.3rem;font-size:.94rem;line-height:1.45}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.grid3{grid-template-columns:repeat(3,1fr)}.grid1{grid-template-columns:1fr}.split{display:grid;grid-template-columns:minmax(320px,.9fr) minmax(420px,1.1fr);gap:1.2rem;align-items:start}
+    @media(max-width:900px){.grid,.grid3,.split{grid-template-columns:1fr}header{height:auto;min-height:72px;padding:.7rem 1rem;align-items:flex-start}.badge{display:none}.steps{top:72px}.toolbar{margin-left:auto}}
+    .card{background:rgba(255,255,255,.94);border:1px solid var(--border);border-radius:18px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 16px 46px rgba(0,63,107,.09)}
+    .card-title{display:flex;align-items:center;justify-content:space-between;gap:.7rem;color:var(--blue);font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem}
+    .field{display:flex;flex-direction:column;gap:.4rem}.field label{font-size:.8rem;color:var(--muted);font-weight:600}.hint{font-size:.75rem;color:var(--muted);line-height:1.35}
+    input,select,textarea{width:100%;background:#ffffff;border:1px solid var(--border);border-radius:10px;color:var(--text);padding:.7rem .8rem;font-size:.9rem;outline:none}textarea{min-height:110px;resize:vertical;line-height:1.45}input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,99,163,.10)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;border:0;border-radius:10px;padding:.72rem 1.05rem;font-weight:800;font-size:.88rem;cursor:pointer;transition:.18s}.btn:disabled{opacity:.45;cursor:not-allowed}.primary{background:var(--blue);color:#fff}.primary:hover{background:var(--blue2)}.secondary{background:#ffffff;border:1px solid var(--border);color:var(--blue)}.secondary:hover{border-color:var(--blue);color:var(--blue2);background:var(--surface2)}.ghost{background:transparent;border:1px dashed var(--border);color:var(--muted)}.ghost:hover{border-color:var(--blue);color:var(--blue)}.danger{background:rgba(255,107,107,.08);color:var(--danger);border:1px solid rgba(255,107,107,.2)}
+    .row{display:flex;gap:.7rem;align-items:center;flex-wrap:wrap}.nav{display:flex;justify-content:space-between;gap:1rem;margin-top:1.2rem}.right{margin-left:auto}.pill{display:inline-flex;align-items:center;gap:.35rem;border:1px solid var(--border);background:var(--surface2);border-radius:999px;padding:.28rem .6rem;font-size:.74rem;color:var(--soft);font-weight:700}
+    .notice{border-radius:12px;padding:.85rem 1rem;margin-bottom:1rem;font-size:.86rem;line-height:1.45}.info{background:rgba(66,212,184,.08);border:1px solid rgba(66,212,184,.25);color:#93f2df}.warn{background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.25);color:#ffe18a}.bad{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.25);color:#ffb3b3}
+    .templates{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem}.template{background:rgba(255,255,255,.96);border:1px solid var(--border);border-radius:18px;padding:1.15rem;cursor:pointer;transition:.18s;min-height:145px;box-shadow:0 10px 30px rgba(0,63,107,.06)}.template:hover{border-color:var(--blue);transform:translateY(-2px)}.template.selected{border-color:var(--blue);background:linear-gradient(135deg,var(--surface2),#fff)}.ico{font-size:1.6rem;margin-bottom:.55rem}.tname{font-weight:800;margin-bottom:.3rem}.tdesc{color:var(--muted);font-size:.8rem;line-height:1.4}
+    .catalog-section{border:1px solid var(--border);border-radius:13px;overflow:hidden;margin-bottom:.75rem;background:rgba(29,37,48,.35)}.catalog-head{display:flex;justify-content:space-between;gap:1rem;padding:.75rem .85rem;cursor:pointer;background:var(--surface2);font-weight:800}.catalog-body{display:none;padding:.4rem}.catalog-body.open{display:block}.catalog-item{display:grid;grid-template-columns:1fr 92px 62px;gap:.55rem;align-items:center;padding:.6rem;border-radius:10px}.catalog-item:hover{background:rgba(255,255,255,.03)}.iname{font-size:.88rem;font-weight:700}.idesc{font-size:.74rem;color:var(--muted);margin-top:.15rem}.catalog-item input{padding:.45rem .5rem;font-size:.8rem}.add{background:var(--green);color:var(--blue2);border:0;border-radius:8px;padding:.48rem .55rem;cursor:pointer;font-weight:900}
+    .cart{border:1px solid var(--border);border-radius:18px;overflow:hidden;background:rgba(255,255,255,.96);box-shadow:0 16px 46px rgba(0,63,107,.09)}.cart-head,.cart-foot{padding:1rem 1.1rem;background:var(--surface2);display:flex;align-items:center;justify-content:space-between;gap:1rem}.cart-title{font-family:'Syne';font-weight:800}.empty{padding:2rem;text-align:center;color:var(--muted)}
+    .line{display:grid;grid-template-columns:minmax(180px,1fr) 58px 70px 105px 105px 36px;gap:.5rem;align-items:start;padding:.7rem 1rem;border-top:1px solid var(--border)}.line input{padding:.45rem .5rem;font-size:.82rem}.line .sum{text-align:right;color:var(--blue);font-weight:900;padding-top:.5rem;font-variant-numeric:tabular-nums}.line small{display:block;color:var(--muted);font-size:.72rem;margin-top:.2rem}.x{width:32px;height:32px;border-radius:8px;border:1px solid rgba(255,107,107,.25);background:rgba(255,107,107,.06);color:var(--danger);cursor:pointer;font-weight:900}
+    @media(max-width:740px){.line{grid-template-columns:1fr 60px 84px 38px}.line .unit,.line .desc,.line .sum-label{display:none}.line .sum{text-align:left}}
+    .totalbox{display:grid;gap:.3rem;min-width:260px}.totrow{display:flex;justify-content:space-between;color:var(--soft);font-size:.85rem}.grand{font-family:'Syne';font-size:1.55rem;color:var(--gold);font-weight:800;text-align:right}.tabs{display:flex;gap:.2rem;border:1px solid var(--border);padding:.2rem;border-radius:12px;background:var(--surface2)}.tab{padding:.48rem .8rem;border-radius:9px;color:var(--muted);cursor:pointer;font-weight:800;font-size:.82rem}.tab.active{background:var(--blue);color:#fff}
+    .checklist{display:grid;gap:.55rem}.check{display:flex;justify-content:space-between;gap:.8rem;padding:.75rem .85rem;border:1px solid var(--border);border-radius:12px;background:rgba(29,37,48,.5);font-size:.86rem}.ok{color:var(--teal)}.miss{color:var(--gold)}
+    .previewbar{position:sticky;top:128px;z-index:80;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:18px;padding:.8rem;margin-bottom:1rem;display:flex;gap:.7rem;justify-content:flex-end;align-items:center;flex-wrap:wrap;box-shadow:0 12px 34px rgba(0,63,107,.08)}.paperwrap{background:#dbeaf0;border-radius:18px;padding:1.4rem .5rem;min-height:500px;border:1px solid var(--border)}.page{width:210mm;min-height:297mm;background:var(--paper);color:var(--papertext);margin:0 auto 1rem;box-shadow:0 8px 36px rgba(0,0,0,.24);position:relative;overflow:hidden;font-size:10pt;line-height:1.45}.page-inner{padding:19mm 20mm 28mm;min-height:297mm;position:relative}.phead{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12mm}.plogo{display:flex;align-items:center;color:var(--blue);font-weight:700;font-size:14pt}.pmark{height:11mm;width:auto;display:block;object-fit:contain}.pdf-logo{height:11mm;width:auto;display:block;object-fit:contain}.pref{display:flex;gap:26mm;text-align:right;font-size:8pt}.h1{font-size:17pt;line-height:1.2;color:var(--blue);font-weight:800;margin:0 0 5mm}.h2{font-size:13pt;color:var(--blue);font-weight:800;margin:6mm 0 2mm}.p{margin:0 0 3mm}.ul{margin:1mm 0 4mm 5mm}.ul li{margin-bottom:1mm}.kv{display:grid;grid-template-columns:55mm 1fr;gap:1mm 4mm;margin-bottom:3mm}.price-row{display:grid;grid-template-columns:1fr 42mm;gap:4mm;padding:1.4mm 0}.price-val{text-align:right;font-variant-numeric:tabular-nums}.sum-row{display:grid;grid-template-columns:1fr 42mm;gap:4mm;border-top:1px solid #333;margin-top:2mm;padding-top:2mm;font-weight:800}.calcbox{background:var(--lightblue);border-radius:3mm;padding:5mm 6mm;margin:4mm 0}.calcbox h3{color:var(--blue);font-size:12pt;margin-bottom:2mm}.calcbig{font-size:16pt;color:var(--blue2);font-weight:900}.foot{position:absolute;left:20mm;right:20mm;bottom:10mm;font-size:7.3pt;line-height:1.3}.footgrid{display:grid;grid-template-columns:39mm 36mm 22mm 27mm 1fr;gap:3mm;border-top:0 solid #ddd;padding-top:1mm}.cover{padding:0}.cover-addr{position:absolute;top:28mm;left:20mm;color:var(--blue);font-size:10.5pt;line-height:1.55;z-index:3}.cover-star{position:absolute;right:22mm;top:22mm;width:48mm;height:48mm;z-index:3}.cover-logo{position:absolute;right:20mm;top:22mm;width:58mm;height:auto;z-index:3;display:block;object-fit:contain}.cover-shape{position:absolute;left:0;right:0;top:85mm;bottom:55mm;background:var(--lightblue);border-radius:0 120mm 0 0}.cover-main{position:absolute;left:22mm;right:35mm;top:155mm;z-index:2;color:var(--blue)}.cover-title{font-size:60pt;font-weight:300;letter-spacing:-.035em;line-height:.92;margin-bottom:12mm}.cover-sub{font-size:12pt;line-height:1.8}.cover-foot{position:absolute;bottom:18mm;left:20mm;right:20mm;display:flex;justify-content:space-between;align-items:flex-end;gap:20mm;z-index:3}.vision{max-width:92mm;font-size:7.5pt;color:#333}.vision strong{display:block;color:var(--blue);font-size:8.5pt;margin-bottom:1mm}.biglogo{display:flex;align-items:center;justify-content:flex-end;min-width:58mm}.biglogo svg{width:26px;height:26px}.footer-logo{width:52mm;height:auto;display:block;object-fit:contain}
+    @page{size:A4;margin:0}@media print{body,html{background:#fff}.no-print,header,.steps,.title,.sub,.nav,.previewbar{display:none!important}main{max-width:none;margin:0;padding:0}.panel{display:none!important}.panel.active{display:block!important}.paperwrap{padding:0;background:#fff;border-radius:0}.page{box-shadow:none;margin:0;width:210mm;min-height:297mm;height:297mm;page-break-after:always;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact}.page:last-child{page-break-after:auto}}
+  </style>
+</head>
+<body>
+  <header class="no-print">
+    <img class="brand-logo-img" src="data:image/png;base64,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" alt="Bravida">
+    <div class="brand">Anbud-Generator</div>
+    <div class="toolbar">
+      <button class="btn secondary mini" onclick="saveDraftFile()">💾 Spara</button>
+      <button class="btn secondary mini" onclick="document.getElementById('loadFile').click()">📂 Öppna</button>
+      <button class="btn secondary mini" onclick="exportExcel()">📊 Excel</button>
+      <input type="file" id="loadFile" accept=".json" hidden onchange="loadDraftFile(event)">
+    </div>
+    <div class="badge">v3 · Region Södra Norrland</div>
+  </header>
+
+  <nav class="steps no-print" id="steps">
+    <div class="step active" data-step="template"><span class="num">1</span>Projekttyp</div>
+    <div class="step" data-step="customer"><span class="num">2</span>Kund</div>
+    <div class="step" data-step="scope"><span class="num">3</span>Omfattning</div>
+    <div class="step" data-step="price"><span class="num">4</span>Komponenter & kalkyl</div>
+    <div class="step" data-step="bravida"><span class="num">5</span>Bravida-info</div>
+    <div class="step" data-step="control"><span class="num">6</span>Kontroll</div>
+    <div class="step" data-step="preview"><span class="num">7</span>PDF</div>
+  </nav>
+
+  <main>
+    <section class="panel active" id="panel-template">
+      <h1 class="title">Välj projekttyp</h1>
+      <p class="sub">Mallen fyller automatiskt i standardtext, rätt dokumenttyp och föreslagna poster. Allt kan justeras innan PDF skapas.</p>
+      <div class="notice info">Nyhet i v3: appen autosparar lokalt i webbläsaren, har kontrollista före PDF och AI-knappen är ersatt med en säker textgenerator + kopierbar prompt. Lägg aldrig API-nycklar direkt i frontend.</div>
+      <div class="templates" id="templateGrid"></div>
+      <div class="nav"><div></div><button class="btn primary" onclick="go('customer')">Nästa: Kunduppgifter →</button></div>
+    </section>
+
+    <section class="panel" id="panel-customer">
+      <h1 class="title">Kunduppgifter</h1>
+      <p class="sub">Uppgifterna används på framsida, rubrik, giltighetstid och i dokumenthuvud.</p>
+      <div class="card">
+        <div class="card-title">Beställare</div>
+        <div class="grid">
+          <div class="field"><label>Kundnamn / BRF / företag *</label><input id="kund" placeholder="BRF Exempel"></div>
+          <div class="field"><label>Kontaktperson</label><input id="kontakt" placeholder="För- och efternamn"></div>
+          <div class="field"><label>Gatuadress</label><input id="adress" placeholder="Gata 1"></div>
+          <div class="field"><label>Postnummer & ort *</label><input id="ort" placeholder="852 34 Sundsvall"></div>
+          <div class="field"><label>Anbudsdatum *</label><input id="datum" type="date"></div>
+          <div class="field"><label>Giltighetstid</label><select id="giltig"><option value="30">30 dagar</option><option value="60">60 dagar</option><option value="90">90 dagar</option></select></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Fastighet / tekniskt underlag</div>
+        <div class="grid3">
+          <div class="field"><label>Fastighetsbeteckning</label><input id="fastighet" placeholder="Valfritt"></div>
+          <div class="field"><label>Antal lägenheter</label><input id="lagenheter" type="number" placeholder="24"></div>
+          <div class="field"><label>BOA/LOA m²</label><input id="boa" type="number" placeholder="1400"></div>
+        </div>
+      </div>
+      <div class="nav"><button class="btn secondary" onclick="go('template')">← Tillbaka</button><button class="btn primary" onclick="go('scope')">Nästa: Omfattning →</button></div>
+    </section>
+
+    <section class="panel" id="panel-scope">
+      <h1 class="title">Omfattning & förutsättningar</h1>
+      <p class="sub">Skriv det som ingår, vad som förutsätts och eventuella undantag. Använd en rad per punkt för snygg PDF.</p>
+      <div class="card">
+        <div class="card-title">Projektrubrik</div>
+        <div class="grid1">
+          <div class="field"><label>Dokumenttitel *</label><input id="titel" placeholder="Anbud"></div>
+          <div class="field"><label>Undertitel</label><input id="undertitel" placeholder="Ventilation, VS, el & styr"></div>
+          <div class="field"><label>Kort sammanfattning *</label><input id="sammanfattning" placeholder="Frånluftsåtervinning - Ventilation, VS, el och styr"></div>
+          <div class="field"><label>Dokumenttyp</label><select id="doctype"><option value="anbud">Anbud</option><option value="prisforslag">Prisförslag</option><option value="budgetpris">Budgetpris</option><option value="kontrakt">Kontrakt / uppdrag</option><option value="thinktank">Think Tank / konceptförslag</option></select></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span>Omfattning / ingår</span><span class="row"><button class="btn secondary mini" onclick="smartScope()">✨ Förbättra text</button><button class="btn ghost mini" onclick="copyAIPrompt()">Kopiera AI-prompt</button></span></div>
+        <div class="field"><textarea id="scope" rows="9" placeholder="Projektering och framtagande av principschema.&#10;Leverans och montage enligt överenskommen omfattning.&#10;Driftsättning, funktionskontroll och dokumentation."></textarea></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Undantag / ingår ej</div>
+        <div class="field"><textarea id="exclusions" rows="5">Hantering och deponering av miljöfarligt avfall.
+Asbestsanering eller åtgärder kopplade till miljöfarliga ämnen.
+Servis-, abonnemangs- och anslutningsavgifter.
+Byggnadsarbeten om inget annat uttryckligen anges.</textarea></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Tider</div>
+        <div class="grid">
+          <div class="field"><label>Starttid</label><input id="start" value="Enligt senare överenskommelse"></div>
+          <div class="field"><label>Färdigställande</label><input id="finish" value="Enligt senare överenskommelse"></div>
+        </div>
+      </div>
+      <div class="nav"><button class="btn secondary" onclick="go('customer')">← Tillbaka</button><button class="btn primary" onclick="go('price')">Nästa: Komponenter & kalkyl →</button></div>
+    </section>
+
+    <section class="panel" id="panel-price">
+      <h1 class="title">Komponenter & kalkyl</h1>
+      <p class="sub">Lägg till poster från katalogen. Justera antal, enhet och pris direkt i anbudets poster.</p>
+      <div class="notice warn">Priserna är mallpriser. Kontrollera alltid mot inköp, avtal, underentreprenör och aktuell kalkyl innan anbud lämnas.</div>
+      <div class="split">
+        <div class="card">
+          <div class="card-title"><span>Katalog</span><button class="btn ghost mini" onclick="resetCatalog()">Återställ</button></div>
+          <div id="catalog"></div>
+          <button class="btn ghost" style="width:100%;margin-top:.7rem" onclick="addCatalogItem()">+ Lägg till katalogpost</button>
+        </div>
+        <div>
+          <div class="cart">
+            <div class="cart-head"><div class="cart-title">Anbudets poster</div><button class="btn danger mini" onclick="clearLines()">Töm</button></div>
+            <div id="lines"></div>
+            <div class="line" style="background:var(--surface2)">
+              <input id="customName" placeholder="Egen post">
+              <input id="customQty" type="number" value="1" step="0.1">
+              <input id="customUnit" value="st">
+              <input id="customPrice" type="number" placeholder="à-pris">
+              <button class="btn primary mini" onclick="addCustomLine()">Lägg</button>
+            </div>
+            <div class="cart-foot">
+              <div class="field" style="max-width:180px"><label>Rabatt (%)</label><input id="discount" type="number" value="0" min="0" max="100"></div>
+              <div class="field" style="max-width:180px"><label>Reserv/risk (%)</label><input id="risk" type="number" value="0" min="0" max="100"></div>
+              <div class="totalbox">
+                <div class="totrow"><span>Delsumma</span><span id="subtotal">0 kr</span></div>
+                <div class="totrow"><span>Justering</span><span id="adjustment">0 kr</span></div>
+                <div class="grand" id="grand">0 kr</div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:1rem">
+            <div class="card-title">Timpriser ÄTA</div>
+            <div class="grid3">
+              <div class="field"><label>Montör kr/h</label><input id="rateMontor" type="number" value="620"></div>
+              <div class="field"><label>Projektledare kr/h</label><input id="ratePL" type="number" value="820"></div>
+              <div class="field"><label>Automationstekniker kr/h</label><input id="rateAT" type="number" value="850"></div>
+              <div class="field"><label>Automationsingenjör kr/h</label><input id="rateAI" type="number" value="950"></div>
+              <div class="field"><label>VVS-ingenjör kr/h</label><input id="rateVVS" type="number" value="1050"></div>
+              <div class="field"><label>Materialpåslag (%)</label><input id="ata" type="number" value="18"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="nav"><button class="btn secondary" onclick="go('scope')">← Tillbaka</button><button class="btn primary" onclick="go('bravida')">Nästa: Bravida-info →</button></div>
+    </section>
+
+    <section class="panel" id="panel-bravida">
+      <h1 class="title">Bravida-info & kontakt</h1>
+      <p class="sub">Standardprofil är satt för Region Södra Norrland. Justera vid behov per kontor och projekt.</p>
+      <div class="card">
+        <div class="card-title">Säljare / ansvarig</div>
+        <div class="grid">
+          <div class="field"><label>Namn *</label><input id="sellerName" value="Jonis Awad"></div>
+          <div class="field"><label>Titel</label><input id="sellerTitle" value="Energiingenjör / Affärsutvecklare"></div>
+          <div class="field"><label>Telefon</label><input id="sellerPhone" placeholder="070-XXX XX XX"></div>
+          <div class="field"><label>E-post</label><input id="sellerEmail" placeholder="fornamn.efternamn@bravida.se"></div>
+          <div class="field"><label>Region / kontor</label><input id="office" value="Region Södra Norrland"></div>
+          <div class="field"><label>Ref.nr</label><input id="ref" placeholder="Valfritt"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Serviceavtalskontakt</div>
+        <div class="grid">
+          <div class="field"><label>Namn</label><input id="serviceName"></div>
+          <div class="field"><label>Telefon</label><input id="servicePhone"></div>
+          <div class="field"><label>E-post</label><input id="serviceEmail"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Gällande handlingar</div>
+        <textarea id="docs" rows="5">Detta anbud
+ABT-U 07
+ABT 06</textarea>
+      </div>
+      <div class="nav"><button class="btn secondary" onclick="go('price')">← Tillbaka</button><button class="btn primary" onclick="go('control')">Nästa: Kontroll →</button></div>
+    </section>
+
+    <section class="panel" id="panel-control">
+      <h1 class="title">Kontroll före PDF</h1>
+      <p class="sub">Här ser du snabbt om något viktigt saknas innan du lämnar anbudet vidare.</p>
+      <div id="validationBox"></div>
+      <div class="card">
+        <div class="card-title">Intern notering</div>
+        <textarea id="internalNote" rows="4" placeholder="Syns inte i PDF. Ex: kontrollera inköpspris, offert från UE, teknisk reservation..."></textarea>
+      </div>
+      <div class="nav"><button class="btn secondary" onclick="go('bravida')">← Tillbaka</button><button class="btn primary" onclick="go('preview')">Förhandsgranska PDF →</button></div>
+    </section>
+
+    <section class="panel" id="panel-preview">
+      <h1 class="title no-print">Förhandsgranska & skapa PDF</h1>
+      <p class="sub no-print">Välj specificerat eller endast totalsumma. PDF skapas via webbläsarens utskrift: välj “Spara som PDF”.</p>
+      <div class="previewbar no-print">
+        <button class="btn secondary" onclick="go('control')">← Kontroll</button>
+        <div class="tabs"><div class="tab active" data-mode="itemized" onclick="setMode('itemized')">Specificerat</div><div class="tab" data-mode="summary" onclick="setMode('summary')">Endast totalsumma</div></div>
+        <button class="btn primary" onclick="window.print()">📄 Ladda ner PDF</button>
+      </div>
+      <div class="paperwrap" id="preview"></div>
+    </section>
+  </main>
+
+<script>
+const starPath='M50 0 C50 28 28 50 0 50 C28 50 50 72 50 100 C50 72 72 50 100 50 C72 50 50 28 50 0 Z';
+const BRAVIDA_LOGO=document.querySelector('.brand-logo-img')?.src || '';
+const templates={
+  proptech_basic:{icon:'📦',name:'Proptech BOX Heat',desc:'Grundinstallation av styrcentral. Prisförslag med energitext.',doctype:'prisforslag',titel:'Proptech Box HEAT',undertitel:'Energieffektiv styrutrustning',sammanfattning:'installation av Bravida Proptech Box',scope:['Demontering av befintlig styr- och reglercentral i fjärrvärmecentral.','Installation av Bravida Proptech BOX Heat.','Anslutning av fjärrvärmemätare via M-Bus där det är tekniskt möjligt.','Konfiguration, driftsättning och uppkoppling till Bravidas överordnade system.'],lines:['pb-heat']},
+  proptech_smart:{icon:'📡',name:'Proptech BOX Heat + Smart',desc:'Med trådlösa rumsgivare och smart energikontroll.',doctype:'prisforslag',titel:'Proptech Box HEAT',undertitel:'Smart energikontroll och trådlösa rumsgivare',sammanfattning:'installation av Bravida Proptech Box med smart energikontroll',scope:['Demontering av befintlig styr- och reglercentral i fjärrvärmecentral.','Installation av Bravida Proptech BOX Heat med smart energikontroll.','Leverans och driftsättning av trådlösa inomhusgivare enligt överenskommen omfattning.','Anslutning av fjärrvärmemätare via M-Bus där det är tekniskt möjligt.','Konfiguration, driftsättning och uppkoppling till Bravidas överordnade system.'],lines:['pb-smart']},
+  franluft:{icon:'🌀',name:'Frånluftsåtervinning',desc:'FX-aggregat, VS, el och styr.',doctype:'anbud',titel:'Anbud',undertitel:'Ventilation, VS, el & styr – Frånluftsåtervinning',sammanfattning:'Frånluftsåtervinning - ventilation, VS, el och styr',scope:['Projektering och framtagande av principscheman.','Rivning och bortforsling av befintlig ventilation i fläktrum.','Installation av nya FX-aggregat i fläktrum.','Installation av nytt komplett rörsystem med erforderliga tillbehör.','Elinstallation av aggregat.','Styrinstallation av aggregat inklusive bilder och förberedning för anslutning till överordnat system.'],lines:['fl-projektering','fl-fx-aggregat','fl-el','fl-styr']},
+  fvp:{icon:'♨️',name:'Frånluftsvärmepump',desc:'Byte eller installation av FVP.',doctype:'anbud',titel:'Anbud',undertitel:'Installation av frånluftsvärmepump',sammanfattning:'installation av ny frånluftsvärmepump',scope:['Demontering och bortforsling av befintlig värmepump eller panna.','Leverans och montage av ny frånluftsvärmepump.','Inkoppling mot befintligt värme- och ventilationssystem.','Elinstallation inklusive säkerhetsbrytare och kraftförsörjning.','Styrinstallation, provkörning, intrimning och driftsättning.'],lines:['fvp-demontage','fvp-mellan','fvp-montage','fvp-styr']},
+  berg:{icon:'🏔️',name:'Bergvärme',desc:'Borrhål, värmepump och styr.',doctype:'anbud',titel:'Anbud',undertitel:'Bergvärmeinstallation',sammanfattning:'bergvärmeinstallation inklusive borrhål och värmepump',scope:['Projektering och dimensionering av bergvärmesystem.','Borrning av energibrunnar inklusive kollektor.','Leverans och montage av bergvärmepump i värmecentral.','Inkoppling mot befintligt värmesystem och tappvarmvatten.','Elinstallation, styrinstallation och driftsättning.'],lines:['bv-pump','bv-borr','fvp-styr']},
+  ftx:{icon:'💨',name:'FTX-ventilation',desc:'Från- och tilluft med värmeåtervinning.',doctype:'anbud',titel:'Anbud',undertitel:'FTX-ventilation – från- och tilluft med återvinning',sammanfattning:'FTX-ventilation med värmeåtervinning',scope:['Projektering och kanaldimensionering.','Leverans och montage av FTX-aggregat.','Kanalinstallation till berörda lägenheter eller lokaler.','Montage av till- och frånluftsdon.','Elinstallation och styrinstallation.','Injustering och funktionskontroll efter färdigställande.'],lines:['ftx-small','ftx-kanal','ftx-don','ftx-inj']},
+  injust:{icon:'🔧',name:'Injustering värmesystem',desc:'Injustering, ventiler och systemkontroll.',doctype:'prisforslag',titel:'Prisförslag',undertitel:'Injustering av värmesystem',sammanfattning:'injustering och optimering av värmesystem',scope:['Genomgång av befintligt värmesystem.','Kontroll av radiatorventiler och termostater.','Injustering av radiatorsystem med dokumentation.','Kontroll och intrimning av cirkulationspumpar.','Finjustering av styrcentral och värmekurvor.'],lines:['inj-varme']},
+  vvc_pump:{icon:'🚰',name:'Budgetpris VVC-pump',desc:'Byte av VVC-cirkulationspump med VS/EL.',doctype:'budgetpris',titel:'Budgetpris',undertitel:'Byte av cirkulationspump VVC – VS/EL',sammanfattning:'byte av cirkulationspump VVC',scope:['Befintlig VVC-cirkulationspump demonteras och ersätts med ny energieffektiv EC-pump.','Pumpen dimensioneras efter teoretiskt beräknat behov och erforderligt flöde.','Ny pump reglerar drift efter systemets behov för att minska onödig el- och värmeanvändning.','In- och urkoppling av el ingår i omfattningen.','Driftsättning och funktionskontroll utförs efter montage.'],lines:['vvc-pump','el-inkoppling']},
+  vs_pump:{icon:'♨️',name:'Budgetpris VS-pump',desc:'Byte av cirkulationspump i värmesystem.',doctype:'budgetpris',titel:'Budgetpris',undertitel:'Byte av cirkulationspump VS-system – VS/EL',sammanfattning:'byte av cirkulationspump i värmesystem',scope:['Befintlig VS-cirkulationspump demonteras och ersätts med ny driftsäker och energieffektiv pump.','Ny pump reglerar flöde och tryck efter värmesystemets aktuella behov.','Inkoppling sker mot befintligt kablage för el och styr där detta är möjligt.','Arbetstid för VS- och elinstallation ingår enligt angiven omfattning.','Driftsättning och funktionskontroll utförs efter montage.'],lines:['vs-pump','el-inkoppling']},
+  magnetitfilter:{icon:'🧲',name:'Budgetpris Magnetitfilter',desc:'Installation av magnetit-/smutsfilter i värmesystem.',doctype:'budgetpris',titel:'Budgetpris',undertitel:'Installation av magnetitfilter',sammanfattning:'installation av magnetitfilter i värmesystem',scope:['Leverans och montage av magnetitfilter/smutsavskiljare på gemensam returledning i värmesystemet.','Filtret dimensioneras utifrån systemets flöde, tryck och tekniska förutsättningar.','Magnetitfiltret ska bidra till renare värmevatten och bättre skydd av pumpar, ventiler, värmeväxlare och övriga komponenter.','Avtappnings- och spolmöjlighet ingår enligt vald filterlösning.','Driftsättning, kontroll och genomgång av funktion utförs efter installation.'],lines:['magnetitfilter']},
+  tryckhallning:{icon:'🫧',name:'Tryckhållning & avgasning',desc:'Helautomatisk tryckhållning och undertrycksavgasning.',doctype:'budgetpris',titel:'Budgetpris',undertitel:'Tryckhållnings- och undertrycksavgasningsutrustning – VS/EL',sammanfattning:'installation av tryckhållnings- och avgasningsutrustning',scope:['Leverans och installation av helautomatisk tryckhållningsutrustning med avgasningsfunktion.','Installation anpassas för att skapa stabilt systemtryck och förbättrad vattenkvalitet i värmesystemet.','Expansionskärl, erforderliga anslutningar och systemkomponenter ingår enligt vald lösning.','Elinstallation och driftsättning ingår enligt angiven omfattning.','Systemet ska bidra till förbättrad driftstabilitet, minskat behov av manuell avluftning och bättre systemprestanda över tid.'],lines:['tryckhallning','expansionskarl','el-inkoppling']},
+  stamventil:{icon:'⚙️',name:'Byte stamventil',desc:'Byte av stam-/injusteringsventil i VS-system.',doctype:'budgetpris',titel:'Budgetpris',undertitel:'Byte av stamventil / injusteringsventil',sammanfattning:'byte av stamventil och injusteringsventil i värmesystem',scope:['Befintlig stamventil/injusteringsventil demonteras och ersätts med ny ventil av lämplig modell.','Aktuellt flöde kontrolleras mot tidigare injusteringsvärden där underlag finns.','Ny ventil förinställs för att bibehålla befintliga driftförutsättningar i systemet.','Eventuella avvikelser kan innebära behov av ny injustering av berörda värmestammar.','Arbetet utförs under förutsättning att avstängningar fungerar och att systemet kan göras trycklöst på ett säkert sätt.'],lines:['stamventil']},
+  radiator_injustering:{icon:'🌡️',name:'Radiatorinjustering',desc:'Radiatorer, stamventiler och installationsberäkning.',doctype:'budgetpris',titel:'Budgetpris',undertitel:'Injustering/beräkning av radiatorer och stamventiler',sammanfattning:'injustering och beräkning av radiatorer samt stamventiler',scope:['Demontering av termostater på berörda radiatorer inför injustering.','Beräkning och injustering av radiatorer utifrån kv-värden, ritningsunderlag och systemets tryckförutsättningar.','Motionering av radiatorventiler utförs i samband med genomgången.','Injustering av värmestammar/stamventiler enligt angivet eller beräknat delflöde och totalflöde.','Injusteringsprotokoll och dokumentation lämnas efter utförd insats.'],lines:['radiator-injustering','stam-injustering','installationsberakning']},
+  energideklaration_ovk:{icon:'📋',name:'Energideklaration + OVK',desc:'Kontrakt/uppdrag med energideklaration, OVK och filterbyte.',doctype:'kontrakt',titel:'Kontrakt',undertitel:'Energideklaration, OVK och filterbyte',sammanfattning:'energideklaration, OVK-besiktning och filterbyte',scope:['Insamling och genomgång av energianvändning, driftunderlag och tidigare protokoll.','Platsbesök med okulär genomgång av byggnad och tekniska installationer.','Sammanställning och normalårskorrigering av energianvändning.','Upprättande och registrering av energideklaration i Boverkets register.','Genomförande av OVK-besiktning enligt gällande regler och omfattning.','Filterbyte utförs i samband med platsbesök under förutsättning att rätt filter finns tillgängliga på plats.'],lines:['energideklaration','ovk','filterbyte']},
+  energientreprenad_hybrid:{icon:'🏢',name:'Energientreprenad FX-hybrid',desc:'Större anbud med frånluftsåtervinning och hybridfjärrvärmecentral.',doctype:'anbud',titel:'Energi-entreprenad',undertitel:'Återställande av frånluftsåtervinning med hybridfjärrvärmecentral',sammanfattning:'energientreprenad – VS, EL, VENT och AUTO',scope:['Installation av högeffektivt återvinningsaggregat för frånluftsåtervinning.','Installation av korrekt dimensionerade rörledningar mellan återvinning och värmesystem.','Rör isoleras för att minska energiförluster.','Anslutning till hybridfjärrvärmecentral med erforderliga ventiler, pumpar och styrfunktioner.','El-, VS-, ventilations- och automationsarbeten samordnas inom entreprenaden.','Driftsättning, optimering och överlämning utförs efter färdig installation.'],lines:['fx-aggregat-hybrid','hybrid-fjvcentral','rorpaket-hybrid','auto-styr','el-inkoppling']},
+  energianalys_fx:{icon:'📈',name:'Energianalys FX',desc:'Förstudie/energibehovsanalys inför frånluftsåtervinning.',doctype:'prisforslag',titel:'Prisförslag',undertitel:'Energibehovsanalys och förstudie frånluftsåtervinning',sammanfattning:'energibehovsanalys med åtgärdsförslag för frånluftsåtervinning',scope:['Insamling och genomgång av energiförbrukning och tekniska underlag.','Analys av värmebehov, tappvarmvatten, ventilationsflöden och möjliga återvinningsnivåer.','Bedömning av tekniska förutsättningar för frånluftsåtervinning.','Beräkning av möjlig återvunnen energi, effekt och preliminär besparingspotential.','Sammanställning av rapport med rekommenderat nästa steg.'],lines:['energianalys-fx']},
+  think:{icon:'🧠',name:'Think Tank / koncept',desc:'För tidigt skede: idé, potential och nästa steg.',doctype:'thinktank',titel:'Think Tank',undertitel:'Energioptimering och teknisk utveckling',sammanfattning:'förslag till fortsatt analys och gemensam utveckling',scope:['Genomgång av nuläge, tekniska förutsättningar och identifierade förbättringsområden.','Workshop/avstämning med berörda parter för att prioritera åtgärder.','Framtagning av konceptförslag, preliminär teknisk lösning och beslutsunderlag.','Rekommendation kring nästa steg, ansvarsfördelning och fortsatt kalkylarbete.'],lines:['tt-workshop','tt-underlag']},
+  blank:{icon:'📝',name:'Tom mall',desc:'Börja från grunden.',doctype:'anbud',titel:'Anbud',undertitel:'',sammanfattning:'',scope:[],lines:[]}
+};
+const defaultCatalog={
+  proptech:{icon:'📦',name:'Proptech BOX & styr',items:[
+    {id:'pb-heat',name:'Proptech BOX Heat, grundinstallation',desc:'Demontering, installation, konfiguration, driftsättning och uppkoppling',price:42900,unit:'st'},
+    {id:'pb-smart',name:'Proptech BOX Heat + Smart energikontroll',desc:'Inklusive trådlösa rumsgivare enligt överenskommen omfattning',price:59900,unit:'st'},
+    {id:'pb-rum',name:'Extra trådlös rumsgivare',desc:'Per styck utöver standardleverans',price:690,unit:'st'},
+    {id:'pb-stalldon',name:'Ställdon standard 0–10V',desc:'Komplett leverans och montage',price:7150,unit:'st'},
+    {id:'pb-givare',name:'Givarset inklusive kablage',desc:'Tillopp/retur-givare enligt behov',price:5950,unit:'set'},
+    {id:'pb-mbus',name:'M-Bus anslutning fjärrvärmemätare',desc:'Eventuellt kommunikationskort regleras separat',price:0,unit:'st'}]},
+  ventilation:{icon:'🌀',name:'Ventilation & återvinning',items:[
+    {id:'fl-projektering',name:'Projektering & principscheman',desc:'Komplett projekteringsfas',price:85000,unit:'st'},
+    {id:'fl-rivning',name:'Rivning och bortforsling ventilation',desc:'Per huskropp eller fläktrum',price:120000,unit:'huskropp'},
+    {id:'fl-fx-aggregat',name:'FX-aggregat inklusive montage',desc:'Frånluftsaggregat med återvinning',price:420000,unit:'st'},
+    {id:'fl-ror',name:'Komplett rörsystem återvinning',desc:'Rörsystem med erforderliga tillbehör',price:180000,unit:'huskropp'},
+    {id:'fl-el',name:'Elinstallation aggregat',desc:'Komplett el per aggregat',price:45000,unit:'st'},
+    {id:'fl-styr',name:'Styrinstallation aggregat',desc:'Bilder och förberedning för överordnat system',price:55000,unit:'st'},
+    {id:'ftx-small',name:'FTX-aggregat 1000–2000 l/s',desc:'Komplett från- och tilluft med återvinning',price:195000,unit:'st'},
+    {id:'ftx-kanal',name:'Kanalinstallation FTX',desc:'Per lägenhet eller enhet',price:18500,unit:'lgh'},
+    {id:'ftx-don',name:'Till- och frånluftsdon',desc:'Per lägenhet, komplett',price:4500,unit:'lgh'},
+    {id:'ftx-inj',name:'Injustering ventilation',desc:'Komplett injustering av system',price:35000,unit:'huskropp'}]},
+  heat:{icon:'♨️',name:'Värmepumpar & värme',items:[
+    {id:'fvp-demontage',name:'Demontering befintlig FVP/panna',desc:'Inklusive bortforsling och miljöhantering',price:28000,unit:'st'},
+    {id:'fvp-mellan',name:'Frånluftsvärmepump 20–30 kW',desc:'Komplett leverans inklusive ackumulator',price:245000,unit:'st'},
+    {id:'fvp-montage',name:'Montage FVP inklusive rörmontage',desc:'Inkoppling mot befintligt system',price:85000,unit:'st'},
+    {id:'fvp-styr',name:'Styrsystem värmepump komplett',desc:'Inklusive inkoppling mot BMS/DUC',price:52000,unit:'st'},
+    {id:'bv-pump',name:'Bergvärmepump 20–40 kW',desc:'Komplett värmepump',price:285000,unit:'st'},
+    {id:'bv-borr',name:'Borrhål bergvärme komplett',desc:'Borrning, kollektor och inkoppling per meter',price:350,unit:'m'},
+    {id:'inj-varme',name:'Injustering värmesystem',desc:'Komplett injustering av radiatorsystem',price:18500,unit:'huskropp'},
+    {id:'inj-termo',name:'Byte termostatventil',desc:'Komplett per radiator',price:850,unit:'st'},
+    {id:'inj-pump',name:'Byte cirkulationspump',desc:'Grundfos MAGNA3 eller motsvarande',price:22000,unit:'st'}]},
+  extra:{icon:'➕',name:'Tillkommande & koncept',items:[
+    {id:'etablering',name:'Etablering och transporter',desc:'Start, logistik och transporter',price:15000,unit:'st'},
+    {id:'stallning',name:'Bygg- och arbetsställning',desc:'Beroende på arbetshöjd och tillgänglighet',price:35000,unit:'st'},
+    {id:'dokumentation',name:'Slutdokumentation',desc:'Relationsunderlag, driftkort och dokumentation',price:12000,unit:'st'},
+    {id:'el-inkoppling',name:'El in-/urkoppling',desc:'In- och urkoppling mot befintlig elmatning där förutsättningar finns',price:6500,unit:'st'},
+    {id:'vvc-pump',name:'Byte VVC-cirkulationspump',desc:'Ny energieffektiv EC-pump inklusive VS-montage',price:26900,unit:'st'},
+    {id:'vs-pump',name:'Byte VS-cirkulationspump',desc:'Ny tryckstyrd pump för radiatorsystem/shuntgrupp',price:25900,unit:'st'},
+    {id:'magnetitfilter',name:'Installation magnetitfilter',desc:'Magnetit-/smutsavskiljare inklusive montage och driftsättning',price:34900,unit:'st'},
+    {id:'tryckhallning',name:'Tryckhållning och avgasning',desc:'Helautomatisk tryckhållnings- och undertrycksavgasningsutrustning',price:145000,unit:'st'},
+    {id:'expansionskarl',name:'Expansionskärl och anslutningar',desc:'Expansionskärl med erforderliga anslutningar',price:28500,unit:'st'},
+    {id:'stamventil',name:'Byte stam-/injusteringsventil',desc:'Ny injusteringsventil inklusive inställning per stam',price:4670,unit:'st'},
+    {id:'radiator-injustering',name:'Radiatorinjustering',desc:'Beräkning och injustering per radiator',price:250,unit:'radiator'},
+    {id:'stam-injustering',name:'Injustering värmestammar',desc:'Injustering av stamventiler och dokumentation',price:11000,unit:'st'},
+    {id:'installationsberakning',name:'Installationsberäkning flöden',desc:'Kontroll/beräkning av projekterade flöden på bygghandling',price:15000,unit:'st'},
+    {id:'energideklaration',name:'Energideklaration',desc:'Upprättande och registrering av energideklaration',price:14700,unit:'st'},
+    {id:'ovk',name:'OVK-besiktning',desc:'OVK-besiktning inklusive digitalt protokoll',price:9000,unit:'st'},
+    {id:'filterbyte',name:'Filterbyte',desc:'Filterbyte under förutsättning att rätt filter finns på plats',price:3000,unit:'st'},
+    {id:'fx-aggregat-hybrid',name:'Återvinningsaggregat FX-hybrid',desc:'Leverans och montage av högeffektivt återvinningsaggregat',price:420000,unit:'st'},
+    {id:'hybrid-fjvcentral',name:'Hybridfjärrvärmecentral',desc:'Fjärrvärmecentral med återvinningsanslutning och optimering',price:485000,unit:'st'},
+    {id:'rorpaket-hybrid',name:'Rörpaket frånluftsåtervinning',desc:'Rördragning, isolering, ventiler och anslutningar',price:714000,unit:'st'},
+    {id:'auto-styr',name:'Automation och styrintegration',desc:'Styr, regler, givare och anslutning till överordnat system',price:95000,unit:'st'},
+    {id:'energianalys-fx',name:'Energianalys frånluftsåtervinning',desc:'Förstudie, energibehovsanalys och rapport',price:14700,unit:'st'},
+    {id:'tt-workshop',name:'Think Tank workshop',desc:'Nuläge, möjligheter och prioritering',price:18000,unit:'st'},
+    {id:'tt-underlag',name:'Koncept- och beslutsunderlag',desc:'Sammanställning med rekommenderat nästa steg',price:24000,unit:'st'}]}
+};
+let state={step:'template',selected:null,mode:'itemized',catalog:loadCatalog(),lines:[]};
+const ids=['kund','kontakt','adress','ort','datum','giltig','fastighet','lagenheter','boa','titel','undertitel','sammanfattning','doctype','scope','exclusions','start','finish','discount','risk','rateMontor','ratePL','rateAT','rateAI','rateVVS','ata','sellerName','sellerTitle','sellerPhone','sellerEmail','office','ref','serviceName','servicePhone','serviceEmail','docs','internalNote'];
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s||'').replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))}
+function money(n){return Math.round(Number(n)||0).toLocaleString('sv-SE')+' kr'}
+function num(n){return Number(n)||0}
+function today(){return new Date().toISOString().split('T')[0]}
+function addDays(date,days){const d=new Date(date||today());d.setDate(d.getDate()+num(days));return d.toISOString().split('T')[0]}
+function svg(cls='pmark'){return `<img class="${cls}" src="${BRAVIDA_LOGO}" alt="Bravida">`}
+function loadCatalog(){try{return JSON.parse(localStorage.getItem('bravida-catalog-v3'))||structuredClone(defaultCatalog)}catch(e){return structuredClone(defaultCatalog)}}
+function saveCatalog(){localStorage.setItem('bravida-catalog-v3',JSON.stringify(state.catalog))}
+function boot(){ $('datum').value=today(); renderTemplates(); renderCatalog(); renderLines(); bindInputs(); restoreAuto(); renderTemplates(); renderAll(); }
+function bindInputs(){ids.forEach(id=>{const el=$(id); if(el) el.addEventListener('input',()=>{renderTotals(); debounceSave(); if(state.step==='preview') renderPreview();});}); document.querySelectorAll('.step').forEach(s=>s.addEventListener('click',()=>go(s.dataset.step)));}
+function renderAll(){renderTotals(); if(state.step==='control') renderValidation(); if(state.step==='preview') renderPreview();}
+function go(step){state.step=step; document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active')); $('panel-'+step).classList.add('active'); document.querySelectorAll('.step').forEach(s=>{s.classList.toggle('active',s.dataset.step===step); s.classList.toggle('done',stepIndex(s.dataset.step)<stepIndex(step));}); window.scrollTo({top:0,behavior:'smooth'}); if(step==='control') renderValidation(); if(step==='preview') renderPreview(); debounceSave();}
+function stepIndex(s){return ['template','customer','scope','price','bravida','control','preview'].indexOf(s)}
+function renderTemplates(){const grid=$('templateGrid'); grid.innerHTML=Object.entries(templates).map(([k,t])=>`<div class="template ${state.selected===k?'selected':''}" onclick="pickTemplate('${k}')"><div class="ico">${t.icon}</div><div class="tname">${t.name}</div><div class="tdesc">${t.desc}</div></div>`).join('')}
+function findItem(id){for(const c of Object.values(state.catalog)){const item=c.items.find(i=>i.id===id); if(item) return {...item}} return null}
+function pickTemplate(key){state.selected=key; const t=templates[key]; $('titel').value=t.titel; $('undertitel').value=t.undertitel; $('sammanfattning').value=t.sammanfattning; $('doctype').value=t.doctype; $('scope').value=(t.scope||[]).join('\n'); state.lines=(t.lines||[]).map(id=>({...findItem(id),qty:1})).filter(x=>x.id); renderTemplates(); renderLines(); renderTotals(); debounceSave();}
+function renderCatalog(){const el=$('catalog'); el.innerHTML=Object.entries(state.catalog).map(([key,cat])=>`<div class="catalog-section"><div class="catalog-head" onclick="toggleCat('${key}')"><span>${cat.icon} ${cat.name}</span><span>${cat.items.length} poster ▾</span></div><div class="catalog-body" id="cat-${key}">${cat.items.map(item=>`<div class="catalog-item"><div><div class="iname">${esc(item.name)}</div><div class="idesc">${esc(item.desc||'')}</div></div><input type="number" value="${item.price}" onchange="catPrice('${key}','${item.id}',this.value)"><button class="add" onclick="addLine('${item.id}')">+ Lägg</button></div>`).join('')}</div></div>`).join('')}
+function toggleCat(key){$('cat-'+key).classList.toggle('open')}
+function catPrice(key,id,val){const it=state.catalog[key].items.find(x=>x.id===id); if(it){it.price=num(val); saveCatalog();}}
+function resetCatalog(){if(!confirm('Återställ katalogen till standard?'))return; state.catalog=structuredClone(defaultCatalog); saveCatalog(); renderCatalog();}
+function addCatalogItem(){const name=prompt('Namn på ny katalogpost:'); if(!name)return; const price=num(prompt('Pris exkl. moms:', '0')); state.catalog.extra.items.push({id:'customcat-'+Date.now(),name,desc:'Egen katalogpost',price,unit:'st'}); saveCatalog(); renderCatalog(); $('cat-extra')?.classList.add('open');}
+function addLine(id){const item=findItem(id); if(!item)return; const ex=state.lines.find(x=>x.id===id); if(ex) ex.qty+=1; else state.lines.push({...item,qty:1}); renderLines(); renderTotals(); debounceSave();}
+function renderLines(){const el=$('lines'); if(!state.lines.length){el.innerHTML='<div class="empty">Inga poster tillagda ännu. Lägg till från katalogen eller skapa egen post.</div>'; renderTotals(); return;} el.innerHTML=state.lines.map((l,i)=>`<div class="line"><div><input value="${esc(l.name)}" onchange="updLine(${i},'name',this.value)"><small>${esc(l.desc||'')}</small></div><input type="number" step="0.1" value="${l.qty}" onchange="updLine(${i},'qty',this.value)"><input class="unit" value="${esc(l.unit||'st')}" onchange="updLine(${i},'unit',this.value)"><input type="number" value="${l.price}" onchange="updLine(${i},'price',this.value)"><div class="sum">${money(l.qty*l.price)}</div><button class="x" onclick="removeLine(${i})">×</button></div>`).join('')}
+function updLine(i,f,v){if(['qty','price'].includes(f))v=num(v); state.lines[i][f]=v; renderLines(); renderTotals(); debounceSave();}
+function removeLine(i){state.lines.splice(i,1); renderLines(); renderTotals(); debounceSave();}
+function clearLines(){if(confirm('Töm alla poster?')){state.lines=[];renderLines();renderTotals();debounceSave();}}
+function addCustomLine(){const name=$('customName').value.trim(); const price=num($('customPrice').value); if(!name){alert('Fyll i namn på posten.');return;} state.lines.push({id:'custom-'+Date.now(),name,desc:'',qty:num($('customQty').value)||1,unit:$('customUnit').value||'st',price}); $('customName').value='';$('customPrice').value='';$('customQty').value=1; renderLines();renderTotals();debounceSave();}
+function calc(){const subtotal=state.lines.reduce((s,l)=>s+num(l.qty)*num(l.price),0); const disc=subtotal*(num($('discount').value)/100); const risk=(subtotal-disc)*(num($('risk').value)/100); const total=Math.round(subtotal-disc+risk); return {subtotal,disc,risk,total,adjust:risk-disc};}
+function renderTotals(){const c=calc(); $('subtotal').textContent=money(c.subtotal); $('adjustment').textContent=(c.adjust>=0?'+':'')+money(c.adjust); $('grand').textContent=money(c.total);}
+function smartScope(){const d=data(); const base=(d.scope||'').split('\n').map(x=>x.trim()).filter(Boolean); const extra=[]; if(!base.some(x=>/projektering/i.test(x)))extra.push('Projektering och teknisk samordning enligt överenskommen omfattning.'); if(!base.some(x=>/driftsättning|provkör/i.test(x)))extra.push('Provkörning, funktionskontroll och driftsättning efter färdig installation.'); if(!base.some(x=>/dokument/i.test(x)))extra.push('Överlämning av relevant dokumentation efter färdigställt arbete.'); if(d.doctype==='thinktank')extra.push('Sammanställning av rekommenderat nästa steg för fortsatt beslut och genomförande.'); $('scope').value=[...base,...extra].join('\n'); debounceSave();}
+async function copyAIPrompt(){const d=data(); const prompt=`Du är en tekniskt erfaren projektledare på Bravida Sverige AB. Förbättra omfattning/förutsättningar för ett ${d.doctype}. Skriv på svenska, formellt och konkret, en punkt per rad utan numrering. Hitta inte på siffror.\n\nProjekt: ${d.titel}\nUndertitel: ${d.undertitel}\nSammanfattning: ${d.sammanfattning}\nKund: ${d.kund}\nBefintligt utkast:\n${d.scope}`; await navigator.clipboard.writeText(prompt); alert('AI-prompt kopierad. Klistra in den i ChatGPT och klistra sedan tillbaka texten i omfattningsfältet.');}
+function data(){const d={}; ids.forEach(id=>d[id]=$(id)?.value||''); d.lines=state.lines; d.selected=state.selected; d.mode=state.mode; d.calc=calc(); return d}
+function renderValidation(){const d=data(); const checks=[['Kundnamn',!!d.kund],['Postnummer & ort',!!d.ort],['Datum',!!d.datum],['Dokumenttitel',!!d.titel],['Sammanfattning',!!d.sammanfattning],['Omfattning',!!d.scope],['Minst en prispost',state.lines.length>0],['Säljarnamn',!!d.sellerName],['E-post eller telefon till ansvarig',!!(d.sellerEmail||d.sellerPhone)],['Total större än 0 kr',d.calc.total>0]]; $('validationBox').innerHTML=`<div class="card"><div class="card-title">Status</div><div class="checklist">${checks.map(([name,ok])=>`<div class="check"><span>${name}</span><b class="${ok?'ok':'miss'}">${ok?'✓ Klar':'Behöver fyllas i'}</b></div>`).join('')}</div></div>${checks.every(x=>x[1])?'<div class="notice info">Alla grundkrav är ifyllda. Gör ändå en teknisk och kommersiell kontroll innan anbud skickas.</div>':'<div class="notice warn">Några delar saknas. Du kan ändå förhandsgranska, men PDF:en blir bättre om du kompletterar först.</div>'}`}
+function setMode(m){state.mode=m; document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.mode===m)); renderPreview(); debounceSave();}
+function pHeader(d,page,total){return `<div class="phead"><div class="plogo">${svg('pdf-logo')}</div><div class="pref"><span>Ref.nr:${esc(d.ref?' '+d.ref:'')}</span><span>${page} (${total})</span></div></div>`}
+function footer(){return `<div class="foot"><div>Innehar F-skattesedel</div><div class="footgrid"><div>www.bravida.se</div><div>Besöksadress:<br>&nbsp;</div><div>Tfn:<br>Fax:</div><div>Säte:<br>Stockholm</div><div>Org.nummer:<br>&nbsp;</div></div></div>`}
+function renderPreview(){const d=data(); const totalPages=d.doctype==='thinktank'?4:5; const pages=[]; pages.push(`<div class="page cover"><div class="cover-addr">${d.kund?'<strong>'+esc(d.kund)+'</strong>':''}${d.kontakt?esc(d.kontakt)+'<br>':''}${d.adress?esc(d.adress)+'<br>':''}${esc(d.ort)}</div>${svg('cover-logo')}<div class="cover-shape"></div><div class="cover-main"><div class="cover-title">${esc(d.titel||'Anbud')}</div><div class="cover-sub">${d.undertitel?'<div>'+esc(d.undertitel)+'</div>':''}${d.sammanfattning?'<div>'+esc(d.sammanfattning)+'</div>':''}<div>Datum: ${esc(d.datum||today())}</div></div></div><div class="cover-foot"><div class="vision"><strong>Vår vision</strong>Bravida gör det möjligt för kunderna att utveckla fastigheters fulla potential. Genom service och installation ger vi fastigheter liv – och leder vägen mot ett hållbart och motståndskraftigt samhälle.</div><div class="biglogo">${svg('footer-logo')}</div></div></div>`);
+if(d.doctype==='thinktank') pages.push(thinkPage(d,2,totalPages)); else pages.push(offerPage(d,2,totalPages)); pages.push(scopePage(d,3,totalPages)); pages.push(contactPage(d,4,totalPages)); if(d.doctype!=='thinktank') pages.push(aboutPage(d,5,totalPages)); $('preview').innerHTML=pages.join('')}
+function priceRows(d){if(state.mode==='summary')return ''; return state.lines.map(l=>`<div class="price-row"><div>${num(l.qty)>1?esc(l.qty+' × '):''}${esc(l.name)}${l.desc?'<div style="font-size:8.5pt;color:#555">'+esc(l.desc)+'</div>':''}</div><div class="price-val">${money(num(l.qty)*num(l.price))}</div></div>`).join('')}
+function offerPage(d,p,t){return `<div class="page"><div class="page-inner">${pHeader(d,p,t)}<h1 class="h1">${d.doctype==='prisforslag'?'Prisförslag':'Anbud'} avseende ${esc(d.sammanfattning||'rubricerat arbete')}</h1><p class="p">Bravida erbjuder härmed att utföra rubricerat arbete i enlighet med detta ${d.doctype==='prisforslag'?'prisförslag':'anbud'}.</p><h2 class="h2">Ersättning</h2><p class="p">Arbeten enligt detta dokument utförs mot en ersättning om:</p>${priceRows(d)}<div class="sum-row"><div>TOTAL SUMMA exkl. moms</div><div class="price-val">${money(d.calc.total)}</div></div><p class="p" style="margin-top:4mm">Gällande mervärdesskatt tillkommer och debiteras vid varje faktureringstillfälle. Priset är baserat på dokumentets prisläge.</p><h2 class="h2">Handlingar</h2><p class="p">För dokumentet gäller nedanstående handlingar i angiven ordning:</p><ul class="ul">${lines(d.docs).map(x=>'<li>'+esc(x)+'</li>').join('')}</ul><h2 class="h2">Tider</h2><div class="kv"><div>Starttid:</div><div>${esc(d.start)}</div><div>Tidpunkt för färdigställande:</div><div>${esc(d.finish)}</div></div><h2 class="h2">Kvalitet och miljö</h2><p class="p">Bravida Sverige AB arbetar systematiskt med kvalitet, miljö och arbetsmiljö enligt gällande rutiner.</p>${footer()}</div></div>`}
+function scopePage(d,p,t){return `<div class="page"><div class="page-inner">${pHeader(d,p,t)}<h2 class="h2" style="margin-top:0">Omfattning och förutsättningar</h2><ul class="ul">${lines(d.scope).map(x=>'<li>'+esc(x)+'</li>').join('')}</ul><h2 class="h2">Förtydliganden / ingår ej</h2><ul class="ul">${lines(d.exclusions).map(x=>'<li>'+esc(x)+'</li>').join('')}</ul><h2 class="h2">ÄTA-arbeten</h2><p class="p">Tillkommande material debiteras enligt Bravidas nettopris +${esc(d.ata)}%.</p><div class="kv"><div>Timpris montör:</div><div>SEK ${esc(d.rateMontor)}</div><div>Timpris projektledare:</div><div>SEK ${esc(d.ratePL)}</div><div>Timpris automationstekniker:</div><div>SEK ${esc(d.rateAT)}</div><div>Timpris automationsingenjör:</div><div>SEK ${esc(d.rateAI)}</div><div>Timpris VVS-ingenjör:</div><div>SEK ${esc(d.rateVVS)}</div></div><h2 class="h2">Betalningsvillkor</h2><p class="p">Enligt betalningsplan. ÄTA-arbeten faktureras löpande, betalning 30 dagar netto.</p>${footer()}</div></div>`}
+function contactPage(d,p,t){return `<div class="page"><div class="page-inner">${pHeader(d,p,t)}<h2 class="h2" style="margin-top:0">Serviceavtal</h2><p class="p">Vi erbjuder er även att teckna serviceavtal enligt Bravidas servicekoncept för denna anläggning. Inför färdigställandet kan en serviceansvarig hos Bravida kontakta er med ett mer detaljerat förslag.</p><h2 class="h2">Förfrågningar</h2><p class="p">Förfrågningar angående detta dokument besvaras av:<br>${esc(d.sellerName||'[Säljare]')}<br>${d.sellerPhone?'Telefon: '+esc(d.sellerPhone)+'<br>':''}${d.sellerEmail?'E-post: '+esc(d.sellerEmail):''}</p><p class="p">Detta ${d.doctype==='anbud'?'anbud':'prisförslag'} är giltigt t.o.m. ${addDays(d.datum,d.giltig)}. Förändringar och tillägg ska upprättas skriftligen för att vara bindande.</p>${d.serviceName?`<p class="p">Förfrågningar angående serviceavtal besvaras av:<br>${esc(d.serviceName)}<br>${d.servicePhone?'Telefon: '+esc(d.servicePhone)+'<br>':''}${d.serviceEmail?'E-post: '+esc(d.serviceEmail):''}</p>`:''}<div style="margin-top:10mm"><p class="p">Med vänlig hälsning<br><b>Bravida Sverige AB</b><br>${esc(d.office)}</p><div style="margin:8mm 0 1mm;font-size:20pt;font-style:italic">${esc(d.sellerName)}</div><div>${esc(d.sellerName)}</div><div style="font-size:9pt;color:#555">${esc(d.sellerTitle)}</div></div>${footer()}</div></div>`}
+function aboutPage(d,p,t){return `<div class="page"><div class="page-inner">${pHeader(d,p,t)}<h2 class="h2" style="margin-top:0">Bravida arbetar med alla de funktioner som ger fastigheter liv.</h2><p class="p">Bravida är en heltäckande teknikpartner inom bland annat el, värme och sanitet, ventilation, automation, kyla, säkerhet, sprinkler och teknisk fastighetsdrift.</p><p class="p">Vi kombinerar lokal närhet med nordisk erfarenhet och arbetar med allt från mindre serviceuppdrag till större entreprenad- och energiutvecklingsprojekt.</p><p class="p">Genom service, installation och teknisk rådgivning hjälper Bravida kunder att utveckla fastigheters fulla potential och skapa långsiktigt hållbara lösningar.</p>${footer()}</div></div>`}
+function thinkPage(d,p,t){return `<div class="page"><div class="page-inner">${pHeader(d,p,t)}<h1 class="h1">Think Tank: ${esc(d.sammanfattning||'teknisk utveckling')}</h1><p class="p">Syftet med denna Think Tank är att samla tekniska, kommersiella och verksamhetsnära perspektiv för att identifiera möjliga lösningar, gemensamma verktyg och nästa steg.</p><h2 class="h2">Föreslagen arbetsmodell</h2><ul class="ul"><li>Nulägesbild och prioritering av behov.</li><li>Genomgång av befintliga arbetssätt, mallar och digitala stöd.</li><li>Identifiering av gemensamma komponenter som kan återanvändas mellan projekt.</li><li>Beslut om pilot, ansvariga och fortsatt utveckling.</li></ul><h2 class="h2">Föreslagen insats</h2>${priceRows(d)}<div class="sum-row"><div>TOTAL SUMMA exkl. moms</div><div class="price-val">${money(d.calc.total)}</div></div>${footer()}</div></div>`}
+function lines(s){return String(s||'').split('\n').map(x=>x.trim()).filter(Boolean)}
+function collect(){const d=data(); return {...d,state:{selected:state.selected,mode:state.mode,lines:state.lines,catalog:state.catalog},savedAt:new Date().toISOString(),version:'3.0'}}
+function apply(obj){if(!obj)return; ids.forEach(id=>{if(obj[id]!==undefined && $(id)) $(id).value=obj[id]}); if(obj.state){state.selected=obj.state.selected||state.selected; state.mode=obj.state.mode||state.mode; state.lines=obj.state.lines||[]; state.catalog=obj.state.catalog||state.catalog;} else {state.lines=obj.lines||state.lines;} renderTemplates(); renderCatalog(); renderLines(); renderTotals();}
+function saveDraftFile(){const d=collect(); const safe=(d.kund||'anbud').replace(/[^a-zA-Z0-9åäöÅÄÖ_-]/g,'_'); const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`Bravida_${safe}_${d.datum||today()}.json`; a.click(); URL.revokeObjectURL(a.href);}
+function loadDraftFile(ev){const f=ev.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=e=>{try{apply(JSON.parse(e.target.result)); alert('Anbudet är laddat.'); debounceSave();}catch(err){alert('Kunde inte öppna filen: '+err.message)}}; r.readAsText(f); ev.target.value='';}
+function exportExcel(){const d=data(); const rows=state.lines.map(l=>({Post:l.name,Beskrivning:l.desc||'',Antal:l.qty,Enhet:l.unit,APris:l.price,Summa:num(l.qty)*num(l.price)})); rows.push({Post:'TOTAL exkl. moms',Summa:d.calc.total}); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'Kalkyl'); XLSX.writeFile(wb,`Bravida_kalkyl_${(d.kund||'anbud').replace(/\s+/g,'_')}.xlsx`);}
+let saveTimer; function debounceSave(){clearTimeout(saveTimer); saveTimer=setTimeout(()=>localStorage.setItem('bravida-autosave-v3',JSON.stringify(collect())),350)}
+function restoreAuto(){try{const raw=localStorage.getItem('bravida-autosave-v3'); if(raw && confirm('Det finns en autosparad version. Vill du återställa den?')) apply(JSON.parse(raw));}catch(e){}}
+boot();
+</script>
+</body>
+</html>
