@@ -1,0 +1,3334 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b4054">
+  <meta name="description" content="Lokalt arbetsverktyg för installationssamordning i EcoDataCenter Borlänge.">
+  <title>Installationssamordning | Bravida – EcoDataCenter Borlänge</title>
+  <style>
+    :root {
+      --teal: #00a99d;
+      --teal-dark: #00877d;
+      --navy: #0b4054;
+      --navy-2: #123648;
+      --mint: #e7f6f4;
+      --paper: #ffffff;
+      --canvas: #f1f4f5;
+      --ink: #17241f;
+      --muted: #64767c;
+      --line: #d7e0e2;
+      --red: #c83a46;
+      --red-soft: #fcebed;
+      --amber: #a76800;
+      --amber-soft: #fff2dc;
+      --blue-soft: #eaf2f7;
+      --shadow: 0 12px 34px rgba(11, 64, 84, 0.09);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--ink);
+      font: 15px/1.45 Calibri, Carlito, Arial, Helvetica, sans-serif;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid rgba(0, 169, 157, 0.25);
+      outline-offset: 2px;
+    }
+    .hide { display: none !important; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 8;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar-inner {
+      max-width: 1240px;
+      min-height: 74px;
+      margin: auto;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      min-width: 0;
+    }
+    .wordmark {
+      color: var(--navy);
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      white-space: nowrap;
+    }
+    .wordmark span { color: var(--teal); }
+    .project {
+      border-left: 1px solid var(--line);
+      padding-left: 22px;
+      min-width: 0;
+    }
+    .project strong, .project small {
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .project strong { font-size: 13px; }
+    .project small { color: var(--muted); font-size: 11px; margin-top: 2px; }
+    .top-actions { display: flex; gap: 8px; }
+
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 16px;
+      font-weight: 800;
+      transition: 0.18s ease;
+      white-space: nowrap;
+    }
+    .btn.primary {
+      background: var(--teal);
+      color: #fff;
+      box-shadow: 0 7px 18px rgba(0, 169, 157, 0.25);
+    }
+    .btn.primary:hover { background: var(--teal-dark); transform: translateY(-1px); }
+    .btn.secondary {
+      background: #fff;
+      color: var(--navy);
+      border: 1px solid var(--line);
+    }
+    .btn.secondary:hover { border-color: #a9c3c2; background: #f7faf9; }
+
+    .nav-wrap { background: #fff; }
+    .nav {
+      max-width: 1240px;
+      margin: auto;
+      padding: 0 24px;
+      display: flex;
+      gap: 28px;
+      overflow-x: auto;
+    }
+    .nav button {
+      position: relative;
+      border: 0;
+      background: none;
+      padding: 14px 2px 15px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .nav button::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      border-radius: 3px 3px 0 0;
+      background: transparent;
+    }
+    .nav button.active { color: var(--navy); }
+    .nav button.active::after { background: var(--teal); }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(125deg, var(--navy), var(--teal) 68%, #22c7bb);
+      color: #fff;
+    }
+    .hero::before, .hero::after {
+      content: "";
+      position: absolute;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 50%;
+    }
+    .hero::before { width: 440px; height: 440px; top: -260px; right: -130px; }
+    .hero::after { width: 270px; height: 270px; top: -170px; right: 90px; }
+    .hero-inner {
+      position: relative;
+      max-width: 1240px;
+      margin: auto;
+      padding: 42px 24px 94px;
+    }
+    .hero-top {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 30px;
+    }
+    .kicker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 10px;
+      color: #a9e4dd;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .kicker::before { content: ""; width: 22px; height: 2px; background: #5fc9c0; }
+    .hero h1 {
+      max-width: 790px;
+      margin: 0;
+      font-size: clamp(36px, 5vw, 61px);
+      line-height: 1.02;
+      letter-spacing: -0.052em;
+    }
+    .hero-copy { max-width: 660px; margin: 15px 0 0; color: #d3eeea; font-size: 16px; }
+    .hero-date { min-width: 190px; color: #d3eeea; text-align: right; }
+    .hero-date strong { display: block; margin-top: 3px; color: #fff; font-size: 18px; }
+    .hero-date small { display: block; margin-top: 8px; }
+    body.detail-view .hero, body.detail-view .quick-grid { display: none; }
+    body.detail-view .workspace { margin-top: 0; }
+
+    .workspace {
+      position: relative;
+      z-index: 2;
+      max-width: 1240px;
+      margin: -59px auto 0;
+      padding: 0 24px 72px;
+    }
+    .quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .quick-card {
+      position: relative;
+      min-height: 126px;
+      padding: 18px;
+      border: 1px solid rgba(0, 90, 70, 0.08);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: var(--shadow);
+      text-align: left;
+      transition: 0.18s ease;
+    }
+    .quick-card:hover { transform: translateY(-3px); border-color: #9cc3c6; }
+    .quick-icon {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      margin-bottom: 18px;
+      border-radius: 12px;
+      background: var(--mint);
+      color: var(--teal-dark);
+      font-size: 19px;
+      font-weight: 800;
+    }
+    .quick-card strong { display: block; font-size: 16px; }
+    .quick-card small { display: block; margin-top: 3px; color: var(--muted); }
+    .quick-card .arrow { position: absolute; top: 21px; right: 18px; color: #8ba69d; font-size: 19px; }
+
+    .content { padding-top: 34px; scroll-margin-top: 125px; }
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      margin: 0 0 18px;
+    }
+    .eyebrow {
+      margin: 0 0 5px;
+      color: var(--teal);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+    .section-head h2 { margin: 0; font-size: 29px; letter-spacing: -0.035em; }
+    .section-head p { margin: 6px 0 0; color: var(--muted); }
+    .section-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .date-notice {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 16px;
+      padding: 11px 14px;
+      border: 1px solid var(--amber);
+      border-radius: 11px;
+      background: var(--amber-soft);
+      color: var(--navy);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .date-notice .link { font-size: 13px; }
+
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+    .stat {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 13px;
+      padding: 18px 19px;
+      border: 1px solid var(--teal);
+      border-radius: 15px;
+      background: var(--mint);
+    }
+    /* Måste vara .stat .stat-icon: annars vinner .stat span nedan på specificitet
+       och ikonbokstaven hamnar grå i hörnet istället för centrerad. */
+    .stat .stat-icon {
+      display: grid;
+      place-items: center;
+      width: 43px;
+      height: 43px;
+      margin: 0;
+      border-radius: 12px;
+      background: #fff;
+      color: var(--navy);
+      font-size: 15px;
+      font-weight: 900;
+    }
+    .stat.danger { border-color: var(--red); background: var(--red-soft); }
+    .stat.danger .stat-icon, .stat.danger b { color: var(--red); }
+    .stat.warn { border-color: var(--amber); background: var(--amber-soft); }
+    .stat.warn .stat-icon, .stat.warn b { color: var(--amber); }
+    .stat b { display: block; color: var(--navy); font-size: 28px; line-height: 1; }
+    .stat span { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.65fr) minmax(280px, 0.72fr);
+      gap: 18px;
+    }
+    .panel {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: 0 5px 18px rgba(11, 64, 84, 0.05);
+    }
+    .panel-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 21px 22px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .panel-head h3 { margin: 0; font-size: 20px; letter-spacing: -0.02em; }
+    .link { border: 0; background: none; color: var(--teal); font-size: 12px; font-weight: 900; padding: 5px; }
+    .attention-list { padding: 0 22px; }
+    .point-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: 13px;
+      padding: 16px 0;
+      border-bottom: 1px solid #edf1ef;
+    }
+    .point-row:last-child { border-bottom: 0; }
+    .priority-line { width: 5px; height: 42px; border-radius: 5px; background: #8bb9aa; }
+    .priority-line.Kritisk { background: var(--red); }
+    .priority-line.Hög { background: #d28a17; }
+    .point-row strong, .point-row small { display: block; }
+    .point-row strong { font-size: 14px; }
+    .point-row small { margin-top: 4px; color: var(--muted); font-size: 11px; }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #edf5f2;
+      color: var(--teal-dark);
+      font-size: 10px;
+      font-weight: 900;
+    }
+    .tag.Kritisk { background: var(--red-soft); color: var(--red); }
+    .tag.Hög { background: var(--amber-soft); color: #875500; }
+    .row-tools { display: flex; gap: 5px; }
+    .mini {
+      padding: 7px 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--teal-dark);
+      font-size: 10px;
+      font-weight: 900;
+    }
+    .mini:hover { border-color: #a6c8bd; background: var(--mint); }
+    .date { color: var(--muted); font-size: 11px; white-space: nowrap; }
+
+    .guide { padding: 21px 22px; }
+    .guide h3 { margin: 0 0 18px; font-size: 20px; }
+    .guide-step {
+      display: grid;
+      grid-template-columns: 31px 1fr;
+      align-items: start;
+      gap: 12px;
+      margin: 0 0 17px;
+    }
+    .guide-step b {
+      display: grid;
+      place-items: center;
+      width: 31px;
+      height: 31px;
+      border-radius: 10px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 12px;
+    }
+    .guide-step strong { display: block; margin-top: 1px; font-size: 13px; }
+    .guide-step small { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .principle { padding: 14px; border-radius: 12px; background: var(--mint); color: var(--navy); font-size: 12px; font-weight: 800; }
+    .manager-panel { margin-top: 18px; }
+    .manager-call-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; padding: 2px 22px; }
+    .manager-call {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      padding: 15px 0;
+      border-bottom: 1px solid #edf1ef;
+    }
+    .manager-call .call-icon {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--amber-soft);
+      color: var(--amber);
+      font-weight: 900;
+    }
+    .manager-call strong, .manager-call small { display: block; }
+    .manager-call strong { font-size: 13px; }
+    .manager-call small { margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .overview-secondary { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 20px 0 14px;
+    }
+    .search { position: relative; flex: 1; max-width: 480px; }
+    .search::before { content: "⌕"; position: absolute; top: 7px; left: 14px; color: #80918b; font-size: 20px; }
+    .search input {
+      width: 100%;
+      height: 44px;
+      padding: 0 14px 0 41px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #fff;
+      outline: 0;
+    }
+    .search input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(0, 169, 157, 0.12); }
+    .filters { display: flex; gap: 6px; overflow: auto; padding-bottom: 2px; }
+    .filters button {
+      padding: 9px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .filters button.active { border-color: var(--navy); background: var(--navy); color: #fff; }
+
+    .point-list { display: grid; gap: 10px; }
+    .point-card {
+      display: grid;
+      grid-template-columns: auto minmax(220px, 1.6fr) minmax(150px, 0.7fr) minmax(120px, 0.55fr) minmax(120px, 0.55fr) minmax(140px, 0.55fr) auto;
+      align-items: center;
+      gap: 14px;
+      padding: 17px 18px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fff;
+    }
+    .point-card:hover { border-color: #a9c3c2; box-shadow: 0 5px 17px rgba(11, 64, 84, 0.06); }
+    .type-icon {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      background: var(--mint);
+      color: var(--teal-dark);
+      font-weight: 900;
+    }
+    .point-main strong, .point-main small, .meta strong, .meta small { display: block; }
+    .point-main strong { font-size: 14px; }
+    .point-main small, .meta small { margin-top: 4px; color: var(--muted); font-size: 10px; }
+    .meta strong { font-size: 12px; }
+    .status-select {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .item-actions { display: flex; gap: 5px; }
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 35px;
+      height: 35px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+      color: var(--muted);
+      font-weight: 900;
+    }
+    .icon-btn:hover { background: var(--mint); color: var(--teal); }
+    .icon-btn.delete:hover { border-color: #efc1c6; background: var(--red-soft); color: var(--red); }
+    .late { color: var(--red) !important; }
+    .empty { padding: 38px; color: var(--muted); text-align: center; }
+
+    .discipline-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .discipline-card {
+      min-height: 138px;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fff;
+      text-align: left;
+      transition: 0.18s ease;
+    }
+    .discipline-card:hover { border-color: #9cc3c6; box-shadow: 0 6px 18px rgba(11, 64, 84, 0.08); transform: translateY(-2px); }
+    .discipline-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .discipline-card h3 { margin: 0; color: var(--navy); font-size: 15px; }
+    .discipline-card p { margin: 8px 0 12px; color: var(--muted); font-size: 11px; }
+    .discipline-card small { display: block; color: var(--teal-dark); font-weight: 800; }
+    .count-badge {
+      display: grid;
+      place-items: center;
+      min-width: 28px;
+      height: 28px;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: var(--mint);
+      color: var(--navy);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .contact-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .contact-card {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 14px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fff;
+    }
+    .avatar {
+      display: grid;
+      place-items: center;
+      width: 45px;
+      height: 45px;
+      border-radius: 14px;
+      background: var(--navy);
+      color: #fff;
+      font-weight: 900;
+    }
+    .contact-main strong, .contact-main small { display: block; }
+    .contact-main strong { font-size: 15px; }
+    .contact-main small { margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .contact-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .contact-links a, .contact-links span {
+      color: var(--teal-dark);
+      font-size: 11px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .contact-note { margin: 10px 0 0; color: #465853; font-size: 11px; }
+    .key-label { color: var(--amber); font-size: 10px; font-weight: 900; text-transform: uppercase; }
+
+    .staffing-list { display: grid; gap: 10px; }
+    .staffing-card {
+      display: grid;
+      grid-template-columns: minmax(180px, 1.25fr) repeat(3, minmax(100px, .45fr)) minmax(200px, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fff;
+    }
+    .staffing-card:hover { border-color: #a9c3c2; box-shadow: 0 5px 17px rgba(11,64,84,.06); }
+    .staffing-card strong, .staffing-card small { display: block; }
+    .staffing-card strong { font-size: 14px; }
+    .staffing-card small { margin-top: 4px; color: var(--muted); font-size: 10px; }
+    .staff-number { text-align: center; }
+    .staff-number b { display: block; color: var(--navy); font-size: 23px; line-height: 1; }
+    .staff-number span { display: block; margin-top: 5px; color: var(--muted); font-size: 9px; font-weight: 800; text-transform: uppercase; }
+    .staff-number.absent b { color: var(--red); }
+    .staffing-note { color: #43524c; font-size: 11px; }
+    .staffing-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 22px; }
+    .staffing-summary .stat { min-height: 94px; }
+
+    .group-picker {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 7px;
+      max-height: 190px;
+      overflow: auto;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #f8faf9;
+    }
+    .group-check {
+      display: flex !important;
+      grid-template-columns: auto 1fr !important;
+      align-items: center;
+      gap: 7px !important;
+      padding: 8px 9px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      background: #fff;
+      color: var(--navy) !important;
+      font-size: 10px !important;
+      cursor: pointer;
+    }
+    .group-check:has(input:checked) { border-color: var(--teal); background: var(--mint); }
+    .group-check input { width: 16px; height: 16px; margin: 0; }
+    .group-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+    .group-tag {
+      display: inline-flex;
+      padding: 4px 7px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: var(--navy);
+      font-size: 9px;
+      font-weight: 900;
+    }
+
+    .groups-layout { display: grid; grid-template-columns: 275px minmax(0, 1fr); gap: 18px; align-items: start; }
+    .group-sidebar { position: sticky; top: 132px; overflow: hidden; }
+    .group-sidebar-head { padding: 18px; border-bottom: 1px solid var(--line); }
+    .group-sidebar-head h3 { margin: 0; font-size: 17px; }
+    .group-sidebar-head p { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+    .group-menu { max-height: 65vh; overflow: auto; padding: 7px; }
+    .group-menu button {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      width: 100%;
+      padding: 11px 10px;
+      border: 0;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-align: left;
+    }
+    .group-menu button:hover { background: #f4f8f7; color: var(--navy); }
+    .group-menu button.active { background: var(--navy); color: #fff; }
+    .group-workspace { display: grid; gap: 14px; }
+    .group-hero {
+      position: relative;
+      overflow: hidden;
+      padding: 25px;
+      border-radius: var(--radius);
+      background: linear-gradient(120deg, var(--navy), #126679);
+      color: #fff;
+      box-shadow: var(--shadow);
+    }
+    .group-hero::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      right: -75px;
+      bottom: -100px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 50%;
+    }
+    .group-hero-top { position: relative; z-index: 1; display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
+    .group-hero h2 { margin: 0; font-size: 27px; letter-spacing: -.03em; }
+    .group-hero p { max-width: 650px; margin: 7px 0 0; color: #d3eeea; }
+    .group-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+    .group-actions .btn.secondary { background: rgba(255,255,255,.95); }
+    .group-kpis { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 20px; }
+    .group-kpi { padding: 11px; border: 1px solid rgba(255,255,255,.2); border-radius: 11px; background: rgba(255,255,255,.1); }
+    .group-kpi strong, .group-kpi span { display: block; }
+    .group-kpi strong { font-size: 21px; }
+    .group-kpi span { margin-top: 2px; color: #cce9e5; font-size: 9px; text-transform: uppercase; }
+    .group-columns { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(280px, .75fr); gap: 14px; align-items: start; }
+    .group-panel-body { padding: 2px 18px 12px; }
+    .compact-point, .log-entry, .compact-contact {
+      padding: 14px 0;
+      border-bottom: 1px solid #edf1ef;
+    }
+    .compact-point:last-child, .log-entry:last-child, .compact-contact:last-child { border-bottom: 0; }
+    .compact-point-top, .log-entry-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .compact-point strong, .compact-point small, .log-entry strong, .log-entry small, .compact-contact strong, .compact-contact small { display: block; }
+    .compact-point small, .log-entry small, .compact-contact small { margin-top: 4px; color: var(--muted); font-size: 10px; }
+    .log-entry p { margin: 8px 0 0; color: #43524c; white-space: pre-wrap; }
+    .log-type {
+      display: inline-flex;
+      padding: 4px 7px;
+      border-radius: 999px;
+      background: var(--mint);
+      color: var(--teal-dark);
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .log-type.Möte { background: var(--blue-soft); color: var(--navy); }
+    .log-type.Beslut { background: var(--amber-soft); color: var(--amber); }
+    .log-actions { display: flex; gap: 5px; margin-top: 10px; }
+    .group-log-empty { padding: 28px 10px; color: var(--muted); text-align: center; }
+    .group-two-panels { display: grid; gap: 14px; }
+    .inline-empty { padding: 22px 0; color: var(--muted); text-align: center; font-size: 11px; }
+
+    .report {
+      max-width: 930px;
+      margin: 20px auto 0;
+      padding: 34px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    .report-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      padding-bottom: 21px;
+      border-bottom: 3px solid var(--teal);
+    }
+    .report-top h2 { margin: 4px 0; font-size: 29px; }
+    .report-top p { margin: 0; color: var(--muted); }
+    .report-meta { color: var(--muted); font-size: 11px; text-align: right; }
+    .report-meta strong { display: block; margin-bottom: 7px; color: var(--ink); font-size: 13px; }
+    .report-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 22px 0; }
+    .report-kpis div { padding: 13px; border: 1px solid var(--teal); border-radius: 11px; background: var(--mint); text-align: center; }
+    .report-kpis strong, .report-kpis span { display: block; }
+    .report-kpis strong { color: var(--navy); font-size: 23px; }
+    .report-kpis span { color: var(--muted); font-size: 10px; }
+    .report h3 { margin: 25px 0 10px; padding-bottom: 6px; border-bottom: 2px solid var(--teal); color: var(--navy); font-size: 16px; font-weight: 800; }
+    .report-line { padding: 10px 0; border-bottom: 1px solid #edf1ef; }
+    .report-line strong, .report-line small { display: block; }
+    .report-line small { margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .report-footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--teal); color: var(--muted); font-size: 10px; font-style: italic; }
+
+    .backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(11, 64, 84, 0.65);
+    }
+    .modal {
+      width: min(720px, 100%);
+      max-height: 94vh;
+      overflow: auto;
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: 0 30px 90px rgba(3, 26, 33, 0.3);
+    }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 22px 24px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .modal-head h2 { margin: 0; font-size: 24px; }
+    .close {
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--canvas);
+      color: var(--muted);
+      font-size: 21px;
+    }
+    .form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      padding: 21px 24px 24px;
+    }
+    .form label {
+      display: grid;
+      gap: 6px;
+      color: #43524c;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .form fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+    .form legend { margin-bottom: 6px; color: #43524c; font-size: 11px; font-weight: 900; }
+    .form .wide { grid-column: 1 / -1; }
+    .advanced {
+      grid-column: 1 / -1;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #f8faf9;
+    }
+    .advanced summary {
+      padding: 12px 14px;
+      color: var(--navy);
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .advanced-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      padding: 3px 14px 14px;
+    }
+    .form input, .form select, .form textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      outline: 0;
+    }
+    .form input:focus, .form select:focus, .form textarea:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(0, 169, 157, 0.12);
+    }
+    .check-label {
+      display: flex !important;
+      grid-column: 1 / -1;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 9px !important;
+    }
+    .check-label input { width: 18px; height: 18px; }
+    .form-actions {
+      display: flex;
+      grid-column: 1 / -1;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .storage-note { margin-right: auto; color: var(--muted); font-size: 10px; }
+    .backup-panel { margin-top: 18px; }
+    .backup-body { padding: 16px 18px 18px; }
+    .backup-body p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .backup-state { margin-top: 9px !important; color: var(--navy) !important; font-weight: 800; }
+    .backup-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
+    .staffing-card.needs-check { border-color: var(--amber); }
+    .staffing-note .check-note { margin-top: 4px; color: var(--amber); font-weight: 800; }
+    .field-warning {
+      margin: 0;
+      padding: 10px 12px;
+      border-left: 3px solid var(--amber);
+      border-radius: 7px;
+      background: var(--amber-soft);
+      color: var(--navy);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 40;
+      max-width: 340px;
+      padding: 12px 16px;
+      border-radius: 11px;
+      background: var(--navy-2);
+      color: #fff;
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    @media (max-width: 1040px) {
+      .point-card { grid-template-columns: auto 1fr minmax(140px, 0.55fr) auto; }
+      .point-card .meta.system-meta, .point-card .meta.owner-meta { display: none; }
+      .groups-layout { grid-template-columns: 220px minmax(0, 1fr); }
+      .group-columns { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 980px) {
+      .quick-grid, .stats { grid-template-columns: 1fr 1fr; }
+      .staffing-summary { grid-template-columns: 1fr 1fr; }
+      .overview-grid { grid-template-columns: 1fr; }
+      .discipline-grid { grid-template-columns: 1fr 1fr; }
+      .manager-call-list { grid-template-columns: 1fr; }
+      .overview-secondary { grid-template-columns: 1fr; }
+      .group-picker { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 720px) {
+      .contact-list { grid-template-columns: 1fr; }
+      .groups-layout { grid-template-columns: 1fr; }
+      .group-sidebar { position: static; }
+      .group-menu { display: flex; max-height: none; overflow-x: auto; }
+      .group-menu button { min-width: 180px; }
+    }
+    @media (max-width: 650px) {
+      .topbar-inner { min-height: 66px; padding: 9px 14px; }
+      .wordmark { font-size: 21px; }
+      .project { display: none; }
+      .top-actions .secondary { display: none; }
+      .top-actions .btn { padding: 10px 12px; font-size: 12px; }
+      .nav { gap: 0; justify-content: space-between; padding: 0 14px; }
+      .nav button { padding: 12px 7px 13px; font-size: 10px; }
+      .hero-inner { padding: 31px 16px 82px; }
+      .hero-top { display: block; }
+      .hero h1 { font-size: 38px; }
+      .hero-copy { font-size: 14px; }
+      .hero-date { display: none; }
+      .workspace { padding: 0 14px 80px; }
+      .quick-grid { grid-template-columns: 1fr 1fr; gap: 9px; }
+      .quick-card { min-height: 112px; padding: 14px; }
+      .quick-icon { width: 35px; height: 35px; margin-bottom: 12px; }
+      .quick-card .arrow { display: none; }
+      .quick-card strong { font-size: 14px; }
+      .quick-card small { font-size: 10px; }
+      .content { padding-top: 27px; }
+      .section-head { flex-wrap: wrap; align-items: flex-start; gap: 14px; }
+      .section-head h2 { font-size: 25px; }
+      /* Knapparna doldes tidigare helt på mobil. De som finns duplicerade i
+         gruppens arbetsyta kan döljas, men huvudåtgärderna måste gå att nå. */
+      .section-head > .btn.mobile-duplicate { display: none; }
+      .section-head > .btn, .section-actions > .btn { flex: 1 1 auto; justify-content: center; }
+      .section-actions { width: 100%; }
+      .stats { gap: 8px; }
+      .stat { display: block; padding: 14px; }
+      .stat .stat-icon { width: 34px; height: 34px; margin-bottom: 10px; }
+      .stat b { font-size: 25px; }
+      .point-row { grid-template-columns: auto 1fr auto; }
+      .point-row .tag, .point-row .date { display: none; }
+      .row-tools .mini:first-child { display: none; }
+      .toolbar { flex-direction: column; }
+      .filters { order: 2; }
+      .search { max-width: none; }
+      .point-card { grid-template-columns: auto minmax(0, 1fr); padding: 14px; }
+      .staffing-card { grid-template-columns: 1fr 1fr; padding: 14px; }
+      .staffing-card .item-actions { grid-column: 2; }
+      .point-card > .meta { display: none; }
+      .point-card > .due-meta { display: block; grid-column: 2; }
+      .point-card > .status-select { display: block; grid-column: 2; max-width: 220px; }
+      .item-actions { grid-column: 2; justify-content: flex-start; }
+      .discipline-grid { grid-template-columns: 1fr; }
+      .group-hero-top { display: block; }
+      .group-actions { margin-top: 16px; }
+      .group-kpis { grid-template-columns: 1fr 1fr; }
+      .group-picker { grid-template-columns: 1fr; }
+      .contact-card { grid-template-columns: auto minmax(0, 1fr); }
+      .contact-card > .item-actions { grid-column: 2; }
+      .report { padding: 22px 17px; }
+      .report-top { display: block; }
+      .report-meta { margin-top: 15px; text-align: left; }
+      .report-kpis { grid-template-columns: 1fr 1fr; }
+      .form { grid-template-columns: 1fr; padding: 18px; }
+      .form .wide, .form-actions, .check-label { grid-column: auto; }
+      .advanced { grid-column: auto; }
+      .advanced-grid { grid-template-columns: 1fr; }
+      .form-actions .storage-note { display: none; }
+    }
+    @media print {
+      .topbar, .nav-wrap, .hero, .quick-grid, .no-print { display: none !important; }
+      body, .workspace { background: #fff; }
+      .workspace { margin: 0; padding: 0; }
+      .content { padding: 0; }
+      .report { max-width: none; margin: 0; border: 0; box-shadow: none; }
+      #overview, #list, #groups, #contacts { display: none !important; }
+      #report { display: block !important; }
+      @page { size: A4; margin: 14mm; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="wordmark" aria-label="Bravida">BRAVI<span>DA</span></div>
+        <div class="project">
+          <strong>Installationssamordning</strong>
+          <small>EcoDataCenter · Borlänge</small>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="btn secondary" type="button" onclick="exportBackup()">Säkerhetskopia</button>
+        <button class="btn secondary" type="button" onclick="byId('backupInput').click()">Återställ</button>
+        <input id="backupInput" class="hide" type="file" accept="application/json,.json" onchange="importBackup(event)">
+        <button class="btn primary" type="button" onclick="openPointForm()">+ Ny punkt</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="nav-wrap">
+    <nav class="nav" aria-label="Huvudmeny">
+      <button class="active" type="button" data-view="overview" aria-current="page" onclick="showView('overview')">Översikt</button>
+      <button type="button" data-view="groups" onclick="showView('groups')">Grupper</button>
+      <button type="button" data-view="list" onclick="showView('list')">Punkter</button>
+      <button type="button" data-view="staffing" onclick="showView('staffing')">Bemanning</button>
+      <button type="button" data-view="contacts" onclick="showView('contacts')">Kontakter</button>
+      <button type="button" data-view="report" onclick="showView('report')">Veckorapport</button>
+    </nav>
+  </div>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-top">
+        <div>
+          <p class="kicker">AI-datacenter · Borlänge</p>
+          <h1>Installationssamordning,<br>samlat på ett ställe.</h1>
+          <p class="hero-copy">Samla grupper, anteckningar, möten, beslut och samordningspunkter. Följ ansvar, deadline och nästa steg utan att tappa helheten.</p>
+        </div>
+        <div class="hero-date">
+          Senast öppnad
+          <strong id="todayLabel"></strong>
+          <small>Installationssamordnare: Jonis Awad</small>
+          <small id="backupStatus">Säkerhetskopia har inte skapats ännu</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="workspace">
+    <div class="quick-grid" aria-label="Snabbregistrering">
+      <button class="quick-card" type="button" onclick="openPointForm('Installation')">
+        <span class="quick-icon">I</span><strong>Installation</strong><small>Aktivitet eller montage</small><span class="arrow">→</span>
+      </button>
+      <button class="quick-card" type="button" onclick="openPointForm('Gränssnitt')">
+        <span class="quick-icon">G</span><strong>Gränssnitt</strong><small>Mellan två discipliner</small><span class="arrow">→</span>
+      </button>
+      <button class="quick-card" type="button" onclick="openPointForm('Hinder / RFI')">
+        <span class="quick-icon">R</span><strong>Hinder / RFI</strong><small>Fråga eller blockering</small><span class="arrow">→</span>
+      </button>
+      <button class="quick-card" type="button" onclick="openPointForm('Kontroll')">
+        <span class="quick-icon">K</span><strong>Kontroll</strong><small>Kvalitet och provning</small><span class="arrow">→</span>
+      </button>
+    </div>
+
+    <section id="overview" class="content">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Lägesbild</p>
+          <h2>Det här behöver fokus</h2>
+          <p>Öppna punkter och beslut i projektet just nu.</p>
+        </div>
+        <div class="section-actions">
+          <button class="btn secondary" type="button" onclick="showView('groups');openLogForm('Anteckning')">+ Anteckning</button>
+          <button class="btn primary" type="button" onclick="openPointForm()">+ Lägg till punkt</button>
+        </div>
+      </div>
+      <div class="stats">
+        <article class="stat"><span class="stat-icon">Ö</span><div><b id="openCount">0</b><span>Öppna punkter</span></div></article>
+        <article class="stat danger"><span class="stat-icon">!</span><div><b id="criticalCount">0</b><span>Kritiska</span></div></article>
+        <article class="stat warn"><span class="stat-icon">?</span><div><b id="waitingCount">0</b><span>Väntar på beslut</span></div></article>
+        <article class="stat"><span class="stat-icon">✓</span><div><b id="progressCount">0%</b><span id="doneText">Avklarat</span></div></article>
+      </div>
+      <div class="overview-grid">
+        <section class="panel">
+          <div class="panel-head">
+            <div><p class="eyebrow">Prioriterat</p><h3>Kräver uppmärksamhet</h3></div>
+            <button class="link" type="button" onclick="showView('list')">Visa alla →</button>
+          </div>
+          <div class="attention-list" id="attention"></div>
+        </section>
+        <aside class="panel guide">
+          <p class="eyebrow">Arbetssätt</p>
+          <h3>En bra punkt innehåller</h3>
+          <div class="guide-step"><b>1</b><span><strong>Tydlig fråga</strong><small>Vad ska lösas eller verifieras?</small></span></div>
+          <div class="guide-step"><b>2</b><span><strong>En ansvarig</strong><small>Vem driver frågan till beslut?</small></span></div>
+          <div class="guide-step"><b>3</b><span><strong>Deadline</strong><small>När måste det vara klart?</small></span></div>
+          <div class="guide-step"><b>4</b><span><strong>Nästa steg</strong><small>Hur verifieras att punkten är löst?</small></span></div>
+          <div class="principle">Ingen punkt lämnas utan ansvarig, datum och verifieringsmetod.</div>
+        </aside>
+      </div>
+      <section class="panel manager-panel">
+        <div class="panel-head">
+          <div><p class="eyebrow">Beslut och eskalering</p><h3>Chef behöver kontakta</h3></div>
+          <button class="link" type="button" onclick="showView('report')">Ta med i rapport →</button>
+        </div>
+        <div class="manager-call-list" id="managerCalls"></div>
+      </section>
+      <div class="overview-secondary">
+        <section class="panel">
+          <div class="panel-head"><div><p class="eyebrow">Uppföljning</p><h3>Att följa upp nu</h3></div></div>
+          <div class="attention-list" id="todayFollowUps"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><div><p class="eyebrow">Planering</p><h3>Kommande möten</h3></div><button class="link" type="button" onclick="showView('groups')">Öppna grupper →</button></div>
+          <div class="attention-list" id="upcomingMeetings"></div>
+        </section>
+      </div>
+      <section class="panel backup-panel">
+        <div class="panel-head">
+          <div><p class="eyebrow">Datasäkerhet</p><h3>Säkerhetskopia</h3></div>
+        </div>
+        <div class="backup-body">
+          <p>Allt sparas bara i den här webbläsaren på den här enheten. Rensar du webbdata försvinner uppgifterna. Skapa en säkerhetskopia regelbundet och spara filen på projektservern.</p>
+          <p class="backup-state" id="backupStatusPanel">Säkerhetskopia har inte skapats ännu</p>
+          <div class="backup-actions">
+            <button class="btn primary" type="button" onclick="exportBackup()">Skapa säkerhetskopia</button>
+            <button class="btn secondary" type="button" onclick="byId('backupInput').click()">Återställ från fil</button>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section id="list" class="content hide">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Samlad uppföljning</p>
+          <h2>Samordningspunkter</h2>
+          <p>Sök, filtrera och uppdatera status direkt.</p>
+        </div>
+        <div class="section-actions">
+          <button class="btn secondary" type="button" onclick="exportPointsCsv()">Exportera CSV</button>
+          <button class="btn primary" type="button" onclick="openPointForm()">+ Ny punkt</button>
+        </div>
+      </div>
+      <div class="toolbar">
+        <div class="search">
+          <input id="pointSearch" aria-label="Sök samordningspunkter" placeholder="Sök rubrik, system, område eller ansvarig…" oninput="renderPointList()">
+        </div>
+        <div class="filters" id="pointFilters" aria-label="Filtrera samordningspunkter"></div>
+      </div>
+      <div class="point-list" id="pointList"></div>
+    </section>
+
+    <section id="staffing" class="content hide">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Daglig överblick</p>
+          <h2>Bemanning</h2>
+          <p>Se vilken chef du ska prata med och om en avdelning saknar personer.</p>
+        </div>
+        <div class="section-actions">
+          <label style="display:grid;gap:4px;color:var(--muted);font-size:10px;font-weight:800">Visa datum
+            <input id="staffingViewDate" type="date" onchange="changeStaffingViewDate(this.value)" style="padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:#fff">
+          </label>
+          <button class="btn secondary" type="button" onclick="exportStaffingCsv()">Exportera CSV</button>
+          <button class="btn primary" type="button" onclick="openStaffingForm()">+ Uppdatera avdelning</button>
+        </div>
+      </div>
+      <p id="staffingTodayNotice" class="date-notice hide">
+        Du tittar på ett annat datum än idag.
+        <button class="link" type="button" onclick="goToStaffingToday()">Gå till idag →</button>
+      </p>
+      <div class="staffing-summary">
+        <article class="stat"><span class="stat-icon">P</span><div><b id="staffPlanned">0</b><span>Planerade valt datum</span></div></article>
+        <article class="stat"><span class="stat-icon">T</span><div><b id="staffAvailable">0</b><span>Tillgängliga valt datum</span></div></article>
+        <article class="stat danger"><span class="stat-icon">F</span><div><b id="staffAbsent">0</b><span>Frånvarande valt datum</span></div></article>
+        <article class="stat warn"><span class="stat-icon">!</span><div><b id="staffNeed">0</b><span>Saknas mot plan</span></div></article>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <div><p class="eyebrow">Avdelningar</p><h3 id="staffingDateLabel"></h3></div>
+          <button class="link" type="button" onclick="copyStaffingSummary()">Kopiera lägesbild →</button>
+        </div>
+        <div class="staffing-list" id="staffingList"></div>
+      </div>
+      <p class="principle" style="margin-top:14px">Skriv endast att personen är frånvarande – inte orsak, sjukdom eller annan känslig information.</p>
+    </section>
+
+    <section id="groups" class="content hide">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Arbetsyta per disciplin</p>
+          <h2>Grupper och anteckningar</h2>
+          <p>Allt som rör en grupp på samma ställe: punkter, anteckningar, möten, beslut och kontakter.</p>
+        </div>
+        <button class="btn primary mobile-duplicate" type="button" onclick="openLogForm('Anteckning')">+ Ny anteckning</button>
+      </div>
+      <div class="groups-layout">
+        <aside class="panel group-sidebar">
+          <div class="group-sidebar-head"><h3>Projektets grupper</h3><p>Välj grupp för att öppna arbetsytan.</p></div>
+          <div class="group-menu" id="groupMenu"></div>
+        </aside>
+        <div class="group-workspace">
+          <section class="group-hero">
+            <div class="group-hero-top">
+              <div><p class="eyebrow">Vald grupp</p><h2 id="activeGroupTitle"></h2><p id="activeGroupPurpose"></p></div>
+              <div class="group-actions">
+                <button class="btn secondary" type="button" onclick="openLogForm('Anteckning')">+ Anteckning</button>
+                <button class="btn secondary" type="button" onclick="openLogForm('Möte')">+ Möte</button>
+                <button class="btn secondary" type="button" onclick="openLogForm('Beslut')">+ Beslut</button>
+                <button class="btn primary" type="button" onclick="openPointForm(null, activeGroup)">+ Punkt</button>
+              </div>
+            </div>
+            <div class="group-kpis">
+              <div class="group-kpi"><strong id="groupOpenCount">0</strong><span>Öppna</span></div>
+              <div class="group-kpi"><strong id="groupLateCount">0</strong><span>Försenade</span></div>
+              <div class="group-kpi"><strong id="groupWaitingCount">0</strong><span>Väntar beslut</span></div>
+              <div class="group-kpi"><strong id="groupFollowUpCount">0</strong><span>Följs upp 7 dagar</span></div>
+            </div>
+          </section>
+          <div class="group-columns">
+            <section class="panel">
+              <div class="panel-head"><div><p class="eyebrow">Att göra</p><h3>Öppna samordningspunkter</h3></div><button class="link" type="button" onclick="openPointForm(null, activeGroup)">Lägg till →</button></div>
+              <div class="group-panel-body" id="groupPoints"></div>
+            </section>
+            <div class="group-two-panels">
+              <section class="panel">
+                <div class="panel-head"><div><p class="eyebrow">Kontaktvägar</p><h3>Gruppens kontakter</h3></div><button class="link" type="button" onclick="openContactForm(activeGroup)">Lägg till →</button></div>
+                <div class="group-panel-body" id="groupContacts"></div>
+              </section>
+              <section class="panel">
+                <div class="panel-head"><div><p class="eyebrow">Nästa steg</p><h3>Kommande uppföljning</h3></div></div>
+                <div class="group-panel-body" id="groupFollowUps"></div>
+              </section>
+            </div>
+          </div>
+          <section class="panel">
+            <div class="panel-head"><div><p class="eyebrow">Gruppens logg</p><h3>Anteckningar, möten och beslut</h3></div><span class="row-tools"><button class="mini" type="button" onclick="exportGroupLogCsv()">Exportera</button><button class="link" type="button" onclick="openLogForm('Anteckning')">Skriv anteckning →</button></span></div>
+            <div class="group-panel-body" id="groupLog"></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section id="contacts" class="content hide">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Kontaktvägar</p>
+          <h2>Personer och avdelningar</h2>
+          <p>Samla vem som ansvarar för vad och när personen ska kontaktas.</p>
+        </div>
+        <div class="section-actions">
+          <button class="btn secondary" type="button" onclick="exportContactsCsv()">Exportera kontakter</button>
+          <button class="btn primary" type="button" onclick="openContactForm()">+ Ny kontakt</button>
+        </div>
+      </div>
+      <div class="discipline-grid" id="disciplineGrid"></div>
+      <div class="toolbar">
+        <div class="search">
+          <input id="contactSearch" aria-label="Sök kontakter" placeholder="Sök namn, företag, roll eller disciplin…" oninput="renderContacts()">
+        </div>
+        <div class="filters" id="contactFilters" aria-label="Filtrera kontakter"></div>
+      </div>
+      <div class="contact-list" id="contactList"></div>
+    </section>
+
+    <section id="report" class="content hide">
+      <div class="section-head no-print">
+        <div>
+          <p class="eyebrow">Automatisk sammanställning</p>
+          <h2>Veckorapport</h2>
+          <p>Byggs direkt från punkterna och kontaktlistan.</p>
+        </div>
+        <button class="btn primary" type="button" onclick="window.print()">Skriv ut / PDF</button>
+      </div>
+      <article class="report">
+        <div class="report-top">
+          <div>
+            <p class="eyebrow">Veckorapport</p>
+            <h2>Installationssamordning</h2>
+            <p>EcoDataCenter · Borlänge</p>
+          </div>
+          <div class="report-meta">
+            Rapportdatum
+            <strong id="reportDate"></strong>
+            Ansvarig
+            <strong>Jonis Awad</strong>
+          </div>
+        </div>
+        <div class="report-kpis">
+          <div><strong id="rOpen">0</strong><span>Öppna</span></div>
+          <div><strong id="rCritical">0</strong><span>Kritiska</span></div>
+          <div><strong id="rWaiting">0</strong><span>Väntar på beslut</span></div>
+          <div><strong id="rDone">0</strong><span>Klara</span></div>
+        </div>
+        <h3>1. Viktigaste öppna punkterna</h3>
+        <div id="reportOpen"></div>
+        <h3>2. Beslut som krävs</h3>
+        <div id="reportWaiting"></div>
+        <h3>3. Kontakter för chef</h3>
+        <div id="reportManagerCalls"></div>
+        <h3>4. Nyckelkontakter</h3>
+        <div id="reportContacts"></div>
+        <h3>5. Beslut tagna den här veckan</h3>
+        <div id="reportDecisions"></div>
+        <h3>6. Kommande möten</h3>
+        <div id="reportMeetings"></div>
+        <h3>7. Bemanning idag</h3>
+        <div id="reportStaffing"></div>
+        <h3>8. Lägesbild per grupp</h3>
+        <div id="reportGroups"></div>
+        <div class="report-footer">Bravida Sverige AB · Installationssamordning · EcoDataCenter Borlänge</div>
+      </article>
+    </section>
+  </main>
+
+  <div id="pointModal" class="backdrop hide" onclick="if(event.target === this) closePointForm()">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="pointModalTitle">
+      <div class="modal-head">
+        <div><p class="eyebrow" id="pointModalEyebrow">Ny registrering</p><h2 id="pointModalTitle">Lägg till punkt</h2></div>
+        <button class="close" type="button" aria-label="Stäng" onclick="closePointForm()">×</button>
+      </div>
+      <form class="form" id="pointForm" onsubmit="savePoint(event)">
+        <input id="fId" type="hidden">
+        <label>Typ
+          <select id="fType">
+            <option>Installation</option>
+            <option>Gränssnitt</option>
+            <option>Hinder / RFI</option>
+            <option>Kontroll</option>
+            <option>Tidplan / Beroende</option>
+            <option>Leverans / Logistik</option>
+            <option>Provning / Cx</option>
+            <option>Dokumentation</option>
+            <option>Arbetsmiljö</option>
+          </select>
+        </label>
+        <label>Status
+          <select id="fStatus" onchange="updatePointDecisionFields()">
+            <option>Ej startad</option>
+            <option>Pågår</option>
+            <option>Väntar på beslut</option>
+            <option>Klar</option>
+          </select>
+        </label>
+        <label class="wide">Rubrik *
+          <input id="fTitle" required maxlength="160" placeholder="Vad ska göras, lösas eller beslutas?">
+        </label>
+        <label>System / disciplin
+          <input id="fSystem" maxlength="80" placeholder="Exempel: El / Kyla / Styr">
+        </label>
+        <fieldset class="wide group-fieldset">
+          <legend>Berörda grupper *</legend>
+          <span class="group-picker" id="pointGroupPicker"></span>
+        </fieldset>
+        <label>Område
+          <input id="fArea" maxlength="80" placeholder="Exempel: Datahall A">
+        </label>
+        <label>Ansvarig *
+          <input id="fOwner" list="ownerOptions" required maxlength="100" placeholder="Namn, roll eller företag">
+          <datalist id="ownerOptions"></datalist>
+        </label>
+        <label>Klart senast *
+          <input id="fDue" type="date" required>
+        </label>
+        <label>Prioritet
+          <select id="fPriority">
+            <option>Normal</option>
+            <option>Hög</option>
+            <option>Kritisk</option>
+          </select>
+        </label>
+        <label>Verifiering *
+          <input id="fVerification" required maxlength="140" placeholder="Exempel: Foto, egenkontroll eller provning">
+        </label>
+        <details class="advanced" id="pointAdvanced">
+          <summary>Beslut, eskalering, uppföljning och referens</summary>
+          <div class="advanced-grid">
+            <label>Referens
+              <input id="fReference" maxlength="160" placeholder="Ritning, RFI, protokoll eller länk">
+            </label>
+            <label>Nästa uppföljning
+              <input id="fNextFollowUp" type="date">
+            </label>
+            <label class="check-label">
+              <input id="fDecisionRequired" type="checkbox" onchange="updatePointDecisionFields()">
+              Beslut eller chefsinsats krävs
+            </label>
+            <label>Beslut krävs från
+              <input id="fDecisionFrom" list="ownerOptions" maxlength="100" placeholder="Namn eller beslutsroll">
+            </label>
+            <label>Eskaleras till
+              <input id="fEscalation" list="ownerOptions" maxlength="100" placeholder="Namn eller chefsroll">
+            </label>
+          </div>
+        </details>
+        <label class="wide">Anteckning
+          <textarea id="fNote" rows="3" maxlength="800" placeholder="Nästa steg, beslut som krävs eller annan viktig information…"></textarea>
+        </label>
+        <div class="form-actions">
+          <span class="storage-note">Sparas lokalt på den här enheten</span>
+          <button type="button" class="btn secondary" onclick="closePointForm()">Avbryt</button>
+          <button class="btn primary" id="savePointButton">Spara punkt</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div id="contactModal" class="backdrop hide" onclick="if(event.target === this) closeContactForm()">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
+      <div class="modal-head">
+        <div><p class="eyebrow" id="contactModalEyebrow">Ny kontakt</p><h2 id="contactModalTitle">Lägg till kontakt</h2></div>
+        <button class="close" type="button" aria-label="Stäng" onclick="closeContactForm()">×</button>
+      </div>
+      <form class="form" id="contactForm" onsubmit="saveContact(event)">
+        <input id="cId" type="hidden">
+        <label>Namn *
+          <input id="cName" required maxlength="100" placeholder="För- och efternamn">
+        </label>
+        <label>Företag / avdelning
+          <input id="cCompany" maxlength="100" placeholder="Exempel: Bravida eller UE">
+        </label>
+        <label>Roll
+          <input id="cRole" maxlength="100" placeholder="Exempel: Projektchef">
+        </label>
+        <label>Disciplin
+          <select id="cDiscipline">
+            <option>Projektledning / Beställare</option>
+            <option>Bygg / Produktion</option>
+            <option>El</option>
+            <option>Rör / Kyla</option>
+            <option>Ventilation</option>
+            <option>Styr / BMS</option>
+            <option>Tele / ICT / Säkerhet</option>
+            <option>Brand</option>
+            <option>BIM / VDC</option>
+            <option>Driftsättning / Cx</option>
+            <option>BAS-U / Arbetsmiljö</option>
+            <option>Kvalitet / Dokumentation</option>
+            <option>Övrigt</option>
+          </select>
+        </label>
+        <label>Kontaktnivå
+          <select id="cLevel">
+            <option>Operativ</option>
+            <option>Beslut</option>
+            <option>Eskalering</option>
+          </select>
+        </label>
+        <label>E-post
+          <input id="cEmail" type="email" maxlength="140" placeholder="namn@foretag.se">
+        </label>
+        <label>Telefon
+          <input id="cPhone" type="tel" maxlength="40" placeholder="+46 …">
+        </label>
+        <label class="wide">Ansvarsområde / när personen kontaktas
+          <textarea id="cNote" rows="3" maxlength="500" placeholder="Exempel: Beslut om tidplan, prioriteringar och resurser."></textarea>
+        </label>
+        <label class="check-label">
+          <input id="cKey" type="checkbox">
+          Visa som nyckelkontakt i veckorapporten
+        </label>
+        <div class="form-actions">
+          <span class="storage-note">Sparas lokalt på den här enheten</span>
+          <button type="button" class="btn secondary" onclick="closeContactForm()">Avbryt</button>
+          <button class="btn primary" id="saveContactButton">Spara kontakt</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div id="staffingModal" class="backdrop hide" onclick="if(event.target === this) closeStaffingForm()">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="staffingModalTitle">
+      <div class="modal-head">
+        <div><p class="eyebrow" id="staffingModalEyebrow">Daglig bemanning</p><h2 id="staffingModalTitle">Uppdatera avdelning</h2></div>
+        <button class="close" type="button" aria-label="Stäng" onclick="closeStaffingForm()">×</button>
+      </div>
+      <form class="form" id="staffingForm" onsubmit="saveStaffing(event)">
+        <input id="sId" type="hidden">
+        <label>Datum *
+          <input id="sDate" type="date" required>
+        </label>
+        <label>Avdelning *
+          <select id="sDepartment"></select>
+        </label>
+        <label>Avdelningschef
+          <input id="sManager" list="ownerOptions" maxlength="100" placeholder="Namn eller roll">
+        </label>
+        <label>Planerat antal *
+          <input id="sPlanned" type="number" required min="0" max="999" step="1" value="0">
+        </label>
+        <label>Tillgängliga *
+          <input id="sAvailable" type="number" required min="0" max="999" step="1" value="0">
+        </label>
+        <label>Frånvarande
+          <input id="sAbsent" type="number" min="0" max="999" step="1" value="0">
+        </label>
+        <label class="wide">Kort notering
+          <textarea id="sNote" rows="3" maxlength="500" placeholder="Exempel: Behöver två personer till Datahall A."></textarea>
+        </label>
+        <p class="wide field-warning">Skriv aldrig orsak till frånvaro, sjukdom, diagnos eller lön. Noteringen följer med i CSV-export och säkerhetskopia.</p>
+        <div class="form-actions">
+          <span class="storage-note">Sparas lokalt och följer med i säkerhetskopian</span>
+          <button type="button" class="btn secondary" onclick="closeStaffingForm()">Avbryt</button>
+          <button class="btn primary" id="saveStaffingButton">Spara bemanning</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div id="logModal" class="backdrop hide" onclick="if(event.target === this) closeLogForm()">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="logModalTitle">
+      <div class="modal-head">
+        <div><p class="eyebrow" id="logModalEyebrow">Gruppens logg</p><h2 id="logModalTitle">Ny anteckning</h2></div>
+        <button class="close" type="button" aria-label="Stäng" onclick="closeLogForm()">×</button>
+      </div>
+      <form class="form" id="logForm" onsubmit="saveLogEntry(event)">
+        <input id="lId" type="hidden">
+        <label>Typ
+          <select id="lType" onchange="updateLogFormFields()">
+            <option>Anteckning</option>
+            <option>Möte</option>
+            <option>Beslut</option>
+          </select>
+        </label>
+        <label>Datum *
+          <input id="lDate" type="date" required>
+        </label>
+        <fieldset class="wide group-fieldset">
+          <legend>Berörda grupper *</legend>
+          <span class="group-picker" id="logGroupPicker"></span>
+        </fieldset>
+        <label class="wide">Rubrik *
+          <input id="lTitle" required maxlength="160" placeholder="Kort och tydlig rubrik">
+        </label>
+        <label class="wide">Anteckning *
+          <textarea id="lText" rows="5" required maxlength="3000" placeholder="Skriv vad som diskuterades, observerades eller beslutades…"></textarea>
+        </label>
+        <label>Skapad av
+          <input id="lAuthor" maxlength="100" value="Jonis Awad">
+        </label>
+        <label>Kopplad samordningspunkt
+          <select id="lPointId"><option value="">Ingen koppling</option></select>
+        </label>
+        <label class="log-meeting-field hide">Deltagare
+          <input id="lParticipants" maxlength="500" placeholder="Namn eller roller, separera med komma">
+        </label>
+        <label class="log-meeting-field hide">Mötestid
+          <input id="lMeetingTime" type="time">
+        </label>
+        <label class="log-meeting-field hide">Nästa möte
+          <input id="lNextMeeting" type="datetime-local">
+        </label>
+        <label class="log-decision-field hide">Beslutad av
+          <input id="lDecidedBy" list="ownerOptions" maxlength="100" placeholder="Namn eller roll">
+        </label>
+        <label class="log-decision-field hide">Beslutsdatum
+          <input id="lDecisionDate" type="date">
+        </label>
+        <label class="log-decision-field hide">Efter beslut
+          <select id="lDecisionOutcome">
+            <option value="">Ändra inte punktens status</option>
+            <option value="Pågår">Sätt kopplad punkt till Pågår</option>
+            <option value="Klar">Markera kopplad punkt Klar</option>
+          </select>
+        </label>
+        <label class="check-label">
+          <input id="lPinned" type="checkbox">
+          Fäst högst upp i gruppens logg
+        </label>
+        <label class="check-label" id="lActionLabel">
+          <input id="lRequiresAction" type="checkbox" onchange="updateLogFormFields()">
+          Skapa samtidigt en samordningspunkt
+        </label>
+        <div id="logActionFields" class="wide hide">
+          <div class="form" style="padding:0">
+            <label>Ansvarig *
+              <input id="lActionOwner" list="ownerOptions" maxlength="100" placeholder="Namn, roll eller företag">
+            </label>
+            <label>Klart senast *
+              <input id="lActionDue" type="date">
+            </label>
+            <label>Prioritet
+              <select id="lActionPriority"><option>Normal</option><option>Hög</option><option>Kritisk</option></select>
+            </label>
+            <label>Verifiering *
+              <input id="lActionVerification" maxlength="140" placeholder="Hur kontrolleras att det är klart?">
+            </label>
+          </div>
+        </div>
+        <div class="form-actions">
+          <span class="storage-note">Sparas i vald grupp och följer med i säkerhetskopian</span>
+          <button type="button" class="btn secondary" onclick="closeLogForm()">Avbryt</button>
+          <button class="btn primary" id="saveLogButton">Spara anteckning</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div id="toast" class="toast hide" role="status" aria-live="polite"></div>
+
+  <script>
+    "use strict";
+
+    var POINTS_KEY = "dc-samordning-v2";
+    var LEGACY_POINTS_KEY = "dc-samordning-v1";
+    var CONTACTS_KEY = "dc-kontakter-v1";
+    var LOGS_KEY = "dc-grupplogg-v1";
+    var STAFFING_KEY = "dc-bemanning-v1";
+    var STAFFING_VIEW_DATE_KEY = "dc-bemanning-visat-datum";
+    var BACKUP_DATE_KEY = "dc-senaste-sakerhetskopia";
+    var POINT_TYPES = ["Alla", "Installation", "Gränssnitt", "Hinder / RFI", "Kontroll", "Tidplan / Beroende", "Leverans / Logistik", "Provning / Cx", "Dokumentation", "Arbetsmiljö"];
+    var STATUSES = ["Ej startad", "Pågår", "Väntar på beslut", "Klar"];
+    var DISCIPLINES = [
+      { name: "Projektledning / Beställare", purpose: "Prioriteringar, beslut, tidplan, resurser och eskalering." },
+      { name: "Bygg / Produktion", purpose: "Produktionstakt, åtkomst, arbetsberedning, håltagning och byggberoenden." },
+      { name: "El", purpose: "Kraft, reservkraft, jordning, kabelvägar och anslutningar." },
+      { name: "Rör / Kyla", purpose: "CDU, flöden, rörstråk, ventiler, tryck och provning." },
+      { name: "Ventilation", purpose: "Luftflöden, kanalstråk, spjäll, styrning och injustering." },
+      { name: "Styr / BMS", purpose: "Signaler, integrationer, larm, sekvenser och driftsättning." },
+      { name: "Tele / ICT / Säkerhet", purpose: "Nät, kommunikation, passage, kamera och övriga säkerhetssystem." },
+      { name: "Brand", purpose: "Brandtätning, detektion, släckning, utrymning och brandgränser." },
+      { name: "BIM / VDC", purpose: "Modellstatus, utrymme, infästning, samgranskning och kollisioner." },
+      { name: "Driftsättning / Cx", purpose: "Provning, sekvenser, integrerade tester och överlämning." },
+      { name: "BAS-U / Arbetsmiljö", purpose: "Risker, arbetsberedningar, samordning och säkert utförande." },
+      { name: "Kvalitet / Dokumentation", purpose: "Kontrollplaner, egenkontroller, relationshandlingar och spårbarhet." }
+    ];
+
+    var pointFilter = "Alla";
+    var contactFilter = "Alla";
+    var activeGroup = "Projektledning / Beställare";
+    var staffingViewDate = restoreStaffingViewDate();
+    var toastTimer;
+    var lastFocusedElement = null;
+
+    function byId(id) {
+      return document.getElementById(id);
+    }
+
+    function localIsoDate(date) {
+      var value = date || new Date();
+      var year = value.getFullYear();
+      var month = String(value.getMonth() + 1).padStart(2, "0");
+      var day = String(value.getDate()).padStart(2, "0");
+      return year + "-" + month + "-" + day;
+    }
+
+    function dateOffset(days) {
+      var value = new Date();
+      value.setDate(value.getDate() + days);
+      return localIsoDate(value);
+    }
+
+    function isValidIsoDate(value) {
+      if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        return false;
+      }
+      var parsed = new Date(value + "T12:00:00");
+      return !isNaN(parsed.getTime()) && localIsoDate(parsed) === value;
+    }
+
+    function safeDate(value) {
+      return isValidIsoDate(value) ? value : localIsoDate();
+    }
+
+    // Datumvalet ska hjälpa under dagens arbete men aldrig ligga kvar till nästa dag,
+    // annars riskerar man att rapportera gårdagens bemanning som dagens.
+    function restoreStaffingViewDate() {
+      var stored = readStorage(STAFFING_VIEW_DATE_KEY, null);
+      if (stored && typeof stored === "object" && stored.setOn === localIsoDate() && isValidIsoDate(stored.date)) {
+        return stored.date;
+      }
+      return localIsoDate();
+    }
+
+    function rememberStaffingViewDate() {
+      writeStorage(STAFFING_VIEW_DATE_KEY, { date: staffingViewDate, setOn: localIsoDate() });
+    }
+
+    var idSeed = Date.now();
+
+    function newId() {
+      idSeed += 1;
+      return idSeed;
+    }
+
+    function ensureUniqueIds(list) {
+      var seen = {};
+      return (list || []).map(function(item) {
+        if (!item || seen[item.id]) {
+          var replacement = Object.assign({}, item, { id: newId() });
+          seen[replacement.id] = true;
+          return replacement;
+        }
+        seen[item.id] = true;
+        return item;
+      });
+    }
+
+    function reserveIdSeed(list) {
+      (list || []).forEach(function(item) {
+        var value = Number(item && item.id);
+        if (value > idSeed) {
+          idSeed = value;
+        }
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value || "").replace(/[&<>"']/g, function(character) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character];
+      });
+    }
+
+    function escapeAttribute(value) {
+      return escapeHtml(value).replace(/\r?\n/g, " ");
+    }
+
+    function repairMojibake(value) {
+      if (typeof value !== "string" || !/[ÃÂâï]/.test(value)) {
+        return value;
+      }
+      var cp1252 = {
+        0x20ac: 0x80, 0x201a: 0x82, 0x0192: 0x83, 0x201e: 0x84, 0x2026: 0x85,
+        0x2020: 0x86, 0x2021: 0x87, 0x02c6: 0x88, 0x2030: 0x89, 0x0160: 0x8a,
+        0x2039: 0x8b, 0x0152: 0x8c, 0x017d: 0x8e, 0x2018: 0x91, 0x2019: 0x92,
+        0x201c: 0x93, 0x201d: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97,
+        0x02dc: 0x98, 0x2122: 0x99, 0x0161: 0x9a, 0x203a: 0x9b, 0x0153: 0x9c,
+        0x017e: 0x9e, 0x0178: 0x9f
+      };
+      var bytes = [];
+      var characters = Array.from(value);
+      for (var index = 0; index < characters.length; index += 1) {
+        var code = characters[index].codePointAt(0);
+        if (code <= 255) {
+          bytes.push(code);
+        } else if (cp1252[code] !== undefined) {
+          bytes.push(cp1252[code]);
+        } else {
+          return value;
+        }
+      }
+      try {
+        return new TextDecoder("utf-8", { fatal: true }).decode(new Uint8Array(bytes));
+      } catch (error) {
+        return value;
+      }
+    }
+
+    function repairRecord(record) {
+      var result = {};
+      Object.keys(record || {}).forEach(function(key) {
+        result[key] = repairMojibake(record[key]);
+      });
+      return result;
+    }
+
+    function disciplineNames() {
+      return DISCIPLINES.map(function(item) { return item.name; }).concat(["Övrigt"]);
+    }
+
+    function inferGroupsFromText(value) {
+      var text = String(value || "").toLocaleLowerCase("sv-SE");
+      var aliases = [
+        ["Projektledning / Beställare", ["projekt", "beställare"]],
+        ["Bygg / Produktion", ["bygg", "produktion"]],
+        ["El", ["el", "kabel", "kraft", "jordning"]],
+        ["Rör / Kyla", ["rör", "kyla", "cdu", "pump"]],
+        ["Ventilation", ["vent", "kanal", "luft"]],
+        ["Styr / BMS", ["styr", "bms", "signal", "larm"]],
+        ["Tele / ICT / Säkerhet", ["tele", "ict", "nät", "passage", "kamera", "säkerhet"]],
+        ["Brand", ["brand", "släck"]],
+        ["BIM / VDC", ["bim", "vdc", "modell", "kollision"]],
+        ["Driftsättning / Cx", ["driftsättning", "commissioning", " cx", "provning"]],
+        ["BAS-U / Arbetsmiljö", ["bas-u", "arbetsmiljö", "risk"]],
+        ["Kvalitet / Dokumentation", ["kvalitet", "dokument", "egenkontroll", "relation"]]
+      ];
+      var found = aliases.filter(function(item) {
+        return item[1].some(function(alias) { return text.indexOf(alias) !== -1; });
+      }).map(function(item) { return item[0]; });
+      return found.length ? found : ["Övrigt"];
+    }
+
+    function renderGroupPicker(containerId, selected) {
+      var values = Array.isArray(selected) ? selected : [];
+      byId(containerId).innerHTML = disciplineNames().map(function(group) {
+        var id = containerId + "-" + disciplineNames().indexOf(group);
+        return '<label class="group-check" for="' + id + '"><input id="' + id + '" type="checkbox" value="' +
+          escapeAttribute(group) + '" ' + (values.indexOf(group) !== -1 ? "checked" : "") + ">" +
+          '<span>' + escapeHtml(group) + '</span></label>';
+      }).join("");
+    }
+
+    function selectedGroups(containerId) {
+      return Array.from(byId(containerId).querySelectorAll('input[type="checkbox"]:checked')).map(function(input) {
+        return input.value;
+      });
+    }
+
+    function readStorage(key, fallback) {
+      try {
+        var stored = localStorage.getItem(key);
+        return stored ? JSON.parse(stored) : fallback;
+      } catch (error) {
+        return fallback;
+      }
+    }
+
+    function writeStorage(key, value) {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+      } catch (error) {
+        showToast("Kunde inte spara. Kontrollera webbläsarens lagringsinställningar.");
+        return false;
+      }
+    }
+
+    function normalizePoint(point) {
+      var fixed = repairRecord(point);
+      if (fixed.status === "Väntar") {
+        fixed.status = "Väntar på beslut";
+      }
+      if (STATUSES.indexOf(fixed.status) === -1) {
+        fixed.status = "Ej startad";
+      }
+      if (POINT_TYPES.indexOf(fixed.type) === -1) {
+        fixed.type = "Installation";
+      }
+      if (["Normal", "Hög", "Kritisk"].indexOf(fixed.priority) === -1) {
+        fixed.priority = "Normal";
+      }
+      fixed.id = Number(fixed.id) || newId();
+      fixed.verification = fixed.verification || "";
+      fixed.decisionRequired = Boolean(fixed.decisionRequired);
+      fixed.decisionFrom = fixed.decisionFrom || "";
+      fixed.escalation = fixed.escalation || "";
+      fixed.nextFollowUp = fixed.nextFollowUp || "";
+      fixed.groupIds = Array.isArray(fixed.groupIds) ? fixed.groupIds.filter(Boolean) : inferGroupsFromText([fixed.system, fixed.title].join(" "));
+      fixed.reference = fixed.reference || "";
+      fixed.createdAt = fixed.createdAt || new Date().toISOString();
+      fixed.updatedAt = fixed.updatedAt || fixed.createdAt;
+      fixed.closedAt = fixed.closedAt || "";
+      fixed.closeNote = fixed.closeNote || "";
+      return fixed;
+    }
+
+    function initialPoints() {
+      return [];
+    }
+
+    function initialContacts() {
+      return [
+        {
+          id: newId(),
+          name: "Jonis Awad",
+          company: "Bravida Sverige AB",
+          role: "Installationssamordnare",
+          discipline: "Projektledning / Beställare",
+          level: "Operativ",
+          email: "",
+          phone: "",
+          note: "Samordnar gränssnitt, hinder, ansvar, beslut och uppföljning mellan disciplinerna.",
+          key: true
+        }
+      ];
+    }
+
+    function loadPoints() {
+      var current = readStorage(POINTS_KEY, null);
+      if (Array.isArray(current)) {
+        return current.map(normalizePoint);
+      }
+      var legacy = readStorage(LEGACY_POINTS_KEY, null);
+      var migrated = Array.isArray(legacy) ? legacy.map(normalizePoint) : initialPoints();
+      writeStorage(POINTS_KEY, migrated);
+      return migrated;
+    }
+
+    function normalizeContact(contact) {
+      var fixed = repairRecord(contact);
+      fixed.id = Number(fixed.id) || newId();
+      fixed.key = Boolean(fixed.key);
+      fixed.level = fixed.level || "Operativ";
+      if (fixed.discipline === "Projektledning") {
+        fixed.discipline = "Projektledning / Beställare";
+      }
+      return fixed;
+    }
+
+    function normalizeLogEntry(entry) {
+      var fixed = repairRecord(entry);
+      fixed.id = Number(fixed.id) || newId();
+      fixed.type = ["Anteckning", "Möte", "Beslut"].indexOf(fixed.type) !== -1 ? fixed.type : "Anteckning";
+      fixed.groupIds = Array.isArray(fixed.groupIds) && fixed.groupIds.length ? fixed.groupIds : ["Övrigt"];
+      fixed.date = fixed.date || localIsoDate();
+      fixed.author = fixed.author || "Jonis Awad";
+      fixed.pointId = Number(fixed.pointId) || 0;
+      fixed.pinned = Boolean(fixed.pinned);
+      fixed.participants = fixed.participants || "";
+      fixed.meetingTime = fixed.meetingTime || "";
+      fixed.nextMeeting = fixed.nextMeeting || "";
+      fixed.decidedBy = fixed.decidedBy || "";
+      fixed.decisionDate = fixed.decisionDate || "";
+      fixed.decisionOutcome = fixed.decisionOutcome || "";
+      fixed.createdAt = fixed.createdAt || new Date().toISOString();
+      fixed.updatedAt = fixed.updatedAt || fixed.createdAt;
+      return fixed;
+    }
+
+    function normalizeStaffing(entry) {
+      var fixed = repairRecord(entry);
+      fixed.id = Number(fixed.id) || newId();
+      fixed.date = fixed.date || localIsoDate();
+      fixed.department = disciplineNames().indexOf(fixed.department) !== -1 ? fixed.department : "Övrigt";
+      fixed.manager = fixed.manager || "";
+      fixed.planned = Math.max(0, Number(fixed.planned) || 0);
+      fixed.available = Math.max(0, Number(fixed.available) || 0);
+      fixed.absent = Math.max(0, Number(fixed.absent) || 0);
+      fixed.note = fixed.note || "";
+      fixed.updatedAt = fixed.updatedAt || new Date().toISOString();
+      return fixed;
+    }
+
+    var points = ensureUniqueIds(loadPoints());
+    var contacts = ensureUniqueIds(readStorage(CONTACTS_KEY, initialContacts()).map(normalizeContact));
+    var logEntries = ensureUniqueIds(readStorage(LOGS_KEY, []).map(normalizeLogEntry));
+    var staffing = ensureUniqueIds(readStorage(STAFFING_KEY, []).map(normalizeStaffing));
+    reserveIdSeed(points);
+    reserveIdSeed(contacts);
+    reserveIdSeed(logEntries);
+    reserveIdSeed(staffing);
+
+    function showToast(message) {
+      var toast = byId("toast");
+      toast.textContent = message;
+      toast.classList.remove("hide");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function() {
+        toast.classList.add("hide");
+      }, 2600);
+    }
+
+    function savePoints(message) {
+      if (writeStorage(POINTS_KEY, points)) {
+        renderAll();
+        if (message) {
+          showToast(message);
+        }
+        return true;
+      }
+      return false;
+    }
+
+    function saveContacts(message) {
+      if (writeStorage(CONTACTS_KEY, contacts)) {
+        renderAll();
+        if (message) {
+          showToast(message);
+        }
+        return true;
+      }
+      return false;
+    }
+
+    function saveLogs(message) {
+      if (writeStorage(LOGS_KEY, logEntries)) {
+        renderAll();
+        if (message) {
+          showToast(message);
+        }
+        return true;
+      }
+      return false;
+    }
+
+    function persistStaffing(message) {
+      if (writeStorage(STAFFING_KEY, staffing)) {
+        renderAll();
+        if (message) {
+          showToast(message);
+        }
+        return true;
+      }
+      return false;
+    }
+
+    function niceDate(value) {
+      if (!value) {
+        return "Inget datum";
+      }
+      return new Intl.DateTimeFormat("sv-SE", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value + "T12:00:00"));
+    }
+
+    function meetingScheduleDate(entry) {
+      if (entry.nextMeeting) {
+        return entry.nextMeeting.slice(0, 10);
+      }
+      return entry.date || "";
+    }
+
+    function priorityRank(priority) {
+      return { "Kritisk": 0, "Hög": 1, "Normal": 2 }[priority] ?? 3;
+    }
+
+    function pointSort(a, b) {
+      var priorityDifference = priorityRank(a.priority) - priorityRank(b.priority);
+      if (priorityDifference !== 0) {
+        return priorityDifference;
+      }
+      return String(a.due || "9999-12-31").localeCompare(String(b.due || "9999-12-31"));
+    }
+
+    function typeLetter(type) {
+      return {
+        "Installation": "I", "Gränssnitt": "G", "Hinder / RFI": "R", "Kontroll": "K",
+        "Tidplan / Beroende": "T", "Leverans / Logistik": "L", "Provning / Cx": "P",
+        "Dokumentation": "D", "Arbetsmiljö": "A"
+      }[type] || "•";
+    }
+
+    function contactInitials(name) {
+      var parts = String(name || "?").trim().split(/\s+/).filter(Boolean);
+      return parts.slice(0, 2).map(function(part) { return part.charAt(0).toUpperCase(); }).join("") || "?";
+    }
+
+    function showView(id) {
+      document.body.classList.toggle("detail-view", id !== "overview");
+      ["overview", "list", "groups", "staffing", "contacts", "report"].forEach(function(viewId) {
+        byId(viewId).classList.toggle("hide", viewId !== id);
+      });
+      document.querySelectorAll(".nav button").forEach(function(button) {
+        var active = button.dataset.view === id;
+        button.classList.toggle("active", active);
+        if (active) {
+          button.setAttribute("aria-current", "page");
+        } else {
+          button.removeAttribute("aria-current");
+        }
+      });
+      if (id === "list") {
+        renderPointList();
+      }
+      if (id === "contacts") {
+        renderContacts();
+      }
+      if (id === "groups") {
+        renderGroups();
+      }
+      if (id === "staffing") {
+        renderStaffing();
+      }
+      if (id === "report") {
+        renderReport();
+      }
+      if (id === "overview") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        byId(id).scrollIntoView({ block: "start", behavior: "smooth" });
+      }
+    }
+
+    function selectGroup(group) {
+      activeGroup = group;
+      renderGroups();
+    }
+
+    function pointBelongsToGroup(point, group) {
+      return Array.isArray(point.groupIds) && point.groupIds.indexOf(group) !== -1;
+    }
+
+    function renderGroups() {
+      var selectedDefinition = DISCIPLINES.find(function(item) { return item.name === activeGroup; }) ||
+        { name: activeGroup, purpose: "Övriga frågor som behöver samordnas i projektet." };
+      var groupPoints = points.filter(function(point) { return pointBelongsToGroup(point, activeGroup); });
+      var open = groupPoints.filter(function(point) { return point.status !== "Klar"; }).sort(pointSort);
+      var late = open.filter(function(point) { return point.due && point.due < localIsoDate(); });
+      var waiting = open.filter(function(point) { return point.status === "Väntar på beslut" || point.decisionRequired; });
+      var endDate = dateOffset(7);
+      var followUps = open.filter(function(point) {
+        return point.nextFollowUp && point.nextFollowUp >= localIsoDate() && point.nextFollowUp <= endDate;
+      }).sort(function(a, b) { return a.nextFollowUp.localeCompare(b.nextFollowUp); });
+      var groupContacts = contacts.filter(function(contact) { return contact.discipline === activeGroup; });
+      var groupLogs = logEntries.filter(function(entry) {
+        return entry.groupIds.indexOf(activeGroup) !== -1;
+      }).sort(function(a, b) {
+        if (a.pinned !== b.pinned) { return a.pinned ? -1 : 1; }
+        return String(b.date + b.createdAt).localeCompare(String(a.date + a.createdAt));
+      });
+
+      byId("groupMenu").innerHTML = disciplineNames().map(function(group) {
+        var count = points.filter(function(point) {
+          return point.status !== "Klar" && pointBelongsToGroup(point, group);
+        }).length;
+        var safeGroup = group.replace(/'/g, "\\'");
+        return '<button type="button" class="' + (group === activeGroup ? "active" : "") +
+          '" onclick="selectGroup(\'' + safeGroup + '\')"><span>' + escapeHtml(group) +
+          '</span><span>' + count + '</span></button>';
+      }).join("");
+
+      byId("activeGroupTitle").textContent = selectedDefinition.name;
+      byId("activeGroupPurpose").textContent = selectedDefinition.purpose;
+      byId("groupOpenCount").textContent = open.length;
+      byId("groupLateCount").textContent = late.length;
+      byId("groupWaitingCount").textContent = waiting.length;
+      byId("groupFollowUpCount").textContent = followUps.length;
+
+      byId("groupPoints").innerHTML = open.slice(0, 8).map(function(point) {
+        return '<div class="compact-point"><div class="compact-point-top"><span><strong>' +
+          escapeHtml(point.title) + '</strong><small>' + escapeHtml(point.owner || "Ansvarig saknas") +
+          " · " + niceDate(point.due) + " · " + escapeHtml(point.status) + '</small></span>' +
+          '<button class="mini" type="button" onclick="editPoint(' + point.id + ')">Öppna</button></div></div>';
+      }).join("") || '<p class="inline-empty">Inga öppna punkter i gruppen.</p>';
+
+      byId("groupContacts").innerHTML = groupContacts.map(function(contact) {
+        return '<div class="compact-contact"><strong>' + escapeHtml(contact.name) + '</strong><small>' +
+          escapeHtml([contact.role, contact.company, contact.level].filter(Boolean).join(" · ")) +
+          (contact.phone ? " · " + escapeHtml(contact.phone) : "") + '</small></div>';
+      }).join("") || '<p class="inline-empty">Ingen kontakt registrerad i gruppen.</p>';
+
+      byId("groupFollowUps").innerHTML = followUps.map(function(point) {
+        return '<div class="compact-point"><strong>' + escapeHtml(point.title) + '</strong><small>' +
+          niceDate(point.nextFollowUp) + " · " + escapeHtml(point.owner || "Ansvarig saknas") +
+          '</small></div>';
+      }).join("") || '<p class="inline-empty">Ingen uppföljning de närmaste sju dagarna.</p>';
+
+      byId("groupLog").innerHTML = groupLogs.map(function(entry) {
+        var linked = entry.pointId ? points.find(function(point) { return point.id === entry.pointId; }) : null;
+        return '<article class="log-entry"><div class="log-entry-top"><span><span class="log-type ' +
+          escapeAttribute(entry.type) + '">' + escapeHtml(entry.type) + '</span><strong>' +
+          (entry.pinned ? "📌 " : "") + escapeHtml(entry.title) + '</strong><small>' +
+          niceDate(entry.date) + " · " + escapeHtml(entry.author || "Okänd") +
+          (linked ? " · Punkt: " + escapeHtml(linked.title) : "") + '</small></span>' +
+          '<span class="item-actions"><button class="icon-btn" type="button" aria-label="Redigera ' +
+          escapeAttribute(entry.title) + '" onclick="editLogEntry(' + entry.id + ')">✎</button>' +
+          '<button class="icon-btn delete" type="button" aria-label="Ta bort ' + escapeAttribute(entry.title) +
+          '" onclick="removeLogEntry(' + entry.id + ')">×</button></span></div><p>' +
+          escapeHtml(entry.text) + '</p>' +
+          (entry.participants ? '<small>Deltagare: ' + escapeHtml(entry.participants) + '</small>' : "") +
+          (entry.meetingTime ? '<small>Mötestid: ' + escapeHtml(entry.meetingTime) + '</small>' : "") +
+          (entry.decidedBy ? '<small>Beslutad av: ' + escapeHtml(entry.decidedBy) + '</small>' : "") +
+          (entry.nextMeeting ? '<small>Nästa möte: ' + niceDate(entry.nextMeeting.slice(0, 10)) + '</small>' : "") +
+          '<div class="log-actions">' +
+          (!linked ? '<button class="mini" type="button" onclick="createPointFromLog(' + entry.id + ')">Gör till punkt</button>' : "") +
+          '<button class="mini" type="button" onclick="togglePinnedLog(' + entry.id + ')">' +
+          (entry.pinned ? "Lossa" : "Fäst") + '</button></div></article>';
+      }).join("") || '<p class="group-log-empty">Inga anteckningar ännu. Börja med att skriva vad som gäller för gruppen.</p>';
+    }
+
+    function renderOverview() {
+      var open = points.filter(function(point) { return point.status !== "Klar"; });
+      var done = points.filter(function(point) { return point.status === "Klar"; });
+      var critical = open.filter(function(point) { return point.priority === "Kritisk"; });
+      var waiting = open.filter(function(point) { return point.status === "Väntar på beslut" || point.decisionRequired; });
+      byId("openCount").textContent = open.length;
+      byId("criticalCount").textContent = critical.length;
+      byId("waitingCount").textContent = waiting.length;
+      byId("progressCount").textContent = (points.length ? Math.round(done.length / points.length * 100) : 0) + "%";
+      byId("doneText").textContent = done.length + " av " + points.length + " klara";
+
+      var ranked = open.slice().sort(pointSort);
+      byId("attention").innerHTML = ranked.slice(0, 5).map(function(point) {
+        return '<div class="point-row">' +
+          '<i class="priority-line ' + escapeAttribute(point.priority) + '"></i>' +
+          '<span><strong>' + escapeHtml(point.title) + '</strong><small>' +
+          escapeHtml(point.area || "Område saknas") + " · " + escapeHtml(point.owner || "Ansvarig saknas") +
+          '</small></span>' +
+          '<span><span class="tag ' + escapeAttribute(point.priority) + '">' + escapeHtml(point.priority) +
+          '</span><span class="date">' + niceDate(point.due) + '</span></span>' +
+          '<span class="row-tools"><button class="mini" type="button" onclick="editPoint(' + point.id + ')">Redigera</button>' +
+          '<button class="mini" type="button" onclick="updatePointStatus(' + point.id + ', \'Klar\')">Klar</button></span>' +
+          '</div>';
+      }).join("") || '<p class="empty">Bra jobbat – inga öppna punkter.</p>';
+      renderManagerCalls();
+      renderNextUp();
+    }
+
+    function renderNextUp() {
+      var today = localIsoDate();
+      var weekEnd = dateOffset(7);
+      var followUps = points.filter(function(point) {
+        return point.status !== "Klar" && point.nextFollowUp && point.nextFollowUp <= today;
+      }).sort(function(a, b) { return a.nextFollowUp.localeCompare(b.nextFollowUp); });
+      var meetings = logEntries.filter(function(entry) {
+        var meetingDate = meetingScheduleDate(entry);
+        return entry.type === "Möte" && meetingDate >= today && meetingDate <= weekEnd;
+      }).sort(function(a, b) { return meetingScheduleDate(a).localeCompare(meetingScheduleDate(b)); });
+
+      byId("todayFollowUps").innerHTML = followUps.slice(0, 5).map(function(point) {
+        return '<div class="compact-point"><div class="compact-point-top"><span><strong>' +
+          escapeHtml(point.title) + '</strong><small>' + niceDate(point.nextFollowUp) + " · " +
+          escapeHtml(point.owner || "Ansvarig saknas") + '</small></span><button class="mini" type="button" onclick="editPoint(' +
+          point.id + ')">Öppna</button></div></div>';
+      }).join("") || '<p class="inline-empty">Inget väntar på uppföljning just nu.</p>';
+
+      byId("upcomingMeetings").innerHTML = meetings.slice(0, 5).map(function(entry) {
+        return '<div class="compact-point"><strong>' + escapeHtml(entry.title) + '</strong><small>' +
+          niceDate(meetingScheduleDate(entry)) + (entry.meetingTime ? " kl. " + escapeHtml(entry.meetingTime) : "") +
+          " · " + escapeHtml(entry.groupIds.join(", ")) +
+          '</small></div>';
+      }).join("") || '<p class="inline-empty">Inga möten registrerade de närmaste sju dagarna.</p>';
+    }
+
+    function getManagerCalls() {
+      return points.filter(function(point) {
+        return point.status !== "Klar" && (point.decisionRequired || point.escalation);
+      }).sort(pointSort).map(function(point) {
+        return {
+          point: point,
+          target: point.decisionFrom || point.escalation || point.owner || "Beslutsfattare saknas"
+        };
+      });
+    }
+
+    function renderManagerCalls() {
+      var calls = getManagerCalls();
+      byId("managerCalls").innerHTML = calls.slice(0, 6).map(function(call) {
+        return '<div class="manager-call">' +
+          '<span class="call-icon">!</span>' +
+          '<span><strong>' + escapeHtml(call.target) + '</strong><small>' +
+          escapeHtml(call.point.title) +
+          (call.point.nextFollowUp ? " · Följ upp " + niceDate(call.point.nextFollowUp) : "") +
+          '</small></span>' +
+          '<button class="mini" type="button" onclick="editPoint(' + call.point.id + ')">Öppna</button>' +
+          '</div>';
+      }).join("") || '<p class="empty">Inga chefsbeslut eller eskaleringar är registrerade.</p>';
+    }
+
+    function setPointFilter(value) {
+      pointFilter = value;
+      renderPointList();
+    }
+
+    function renderPointList() {
+      byId("pointFilters").innerHTML = POINT_TYPES.map(function(type) {
+        return '<button type="button" aria-pressed="' + (pointFilter === type) + '" class="' + (pointFilter === type ? "active" : "") +
+          '" onclick="setPointFilter(\'' + type + '\')">' + escapeHtml(type) + '</button>';
+      }).join("");
+
+      var query = String(byId("pointSearch").value || "").toLocaleLowerCase("sv-SE");
+      var rows = points.filter(function(point) {
+        var matchesType = pointFilter === "Alla" || point.type === pointFilter;
+        var haystack = [point.title, point.groupIds.join(" "), point.system, point.area, point.owner, point.note, point.verification, point.reference, point.decisionFrom, point.escalation].join(" ").toLocaleLowerCase("sv-SE");
+        return matchesType && haystack.indexOf(query) !== -1;
+      }).sort(function(a, b) {
+        if (a.status === "Klar" && b.status !== "Klar") { return 1; }
+        if (a.status !== "Klar" && b.status === "Klar") { return -1; }
+        return pointSort(a, b);
+      });
+
+      byId("pointList").innerHTML = rows.map(function(point) {
+        var overdue = point.due && point.due < localIsoDate() && point.status !== "Klar";
+        return '<article class="point-card">' +
+          '<span class="type-icon">' + typeLetter(point.type) + '</span>' +
+          '<span class="point-main"><strong>' + escapeHtml(point.title) + '</strong><small>' +
+          escapeHtml(point.type) + " · " + escapeHtml(point.priority) +
+          (point.verification ? " · Verifiering: " + escapeHtml(point.verification) : "") + '</small>' +
+          '<span class="group-tags">' + point.groupIds.map(function(group) {
+            return '<span class="group-tag">' + escapeHtml(group) + '</span>';
+          }).join("") + '</span></span>' +
+          '<span class="meta system-meta"><strong>' + escapeHtml(point.system || "System saknas") +
+          '</strong><small>' + escapeHtml(point.area || "Område saknas") + '</small></span>' +
+          '<span class="meta owner-meta"><strong>' + escapeHtml(point.owner || "Ej utsedd") +
+          '</strong><small>Ansvarig</small></span>' +
+          '<span class="meta due-meta"><strong class="' + (overdue ? "late" : "") + '">' + niceDate(point.due) +
+          '</strong><small>' + (overdue ? "Försenad" : "Klart senast") + '</small></span>' +
+          '<select class="status-select" aria-label="Status för ' + escapeAttribute(point.title) +
+          '" onchange="updatePointStatus(' + point.id + ', this.value)">' +
+          STATUSES.map(function(status) {
+            return '<option ' + (status === point.status ? "selected" : "") + '>' + escapeHtml(status) + '</option>';
+          }).join("") + '</select>' +
+          '<span class="item-actions"><button class="icon-btn" type="button" title="Redigera" aria-label="Redigera ' +
+          escapeAttribute(point.title) + '" onclick="editPoint(' + point.id + ')">✎</button>' +
+          '<button class="icon-btn delete" type="button" title="Ta bort" aria-label="Ta bort ' +
+          escapeAttribute(point.title) + '" onclick="removePoint(' + point.id + ')">×</button></span>' +
+          '</article>';
+      }).join("") || '<div class="panel empty">Inga punkter matchar filtret.</div>';
+    }
+
+    function renderOwnerOptions() {
+      byId("ownerOptions").innerHTML = contacts.map(function(contact) {
+        return '<option value="' + escapeAttribute(contact.name) + '">' +
+          escapeHtml([contact.role, contact.company].filter(Boolean).join(" · ")) + '</option>';
+      }).join("");
+    }
+
+    function resetPointForm() {
+      byId("pointForm").reset();
+      clearCustomValidity(byId("pointForm"));
+      byId("fId").value = "";
+      byId("fType").value = "Installation";
+      byId("fStatus").value = "Ej startad";
+      byId("fPriority").value = "Normal";
+      byId("fDecisionRequired").checked = false;
+      byId("fDecisionFrom").setCustomValidity("");
+      byId("pointAdvanced").open = false;
+      delete byId("pointForm").dataset.logId;
+      renderGroupPicker("pointGroupPicker", []);
+      byId("pointModalEyebrow").textContent = "Ny registrering";
+      byId("pointModalTitle").textContent = "Lägg till punkt";
+      byId("savePointButton").textContent = "Spara punkt";
+    }
+
+    function openPointForm(type, group) {
+      lastFocusedElement = document.activeElement;
+      resetPointForm();
+      renderOwnerOptions();
+      byId("fType").value = type || "Installation";
+      renderGroupPicker("pointGroupPicker", group ? [group] : []);
+      byId("pointModal").classList.remove("hide");
+      setTimeout(function() { byId("fTitle").focus(); }, 20);
+    }
+
+    function editPoint(id) {
+      var point = points.find(function(item) { return item.id === id; });
+      if (!point) {
+        return;
+      }
+      lastFocusedElement = document.activeElement;
+      resetPointForm();
+      renderOwnerOptions();
+      byId("fId").value = point.id;
+      byId("fType").value = point.type;
+      byId("fStatus").value = point.status;
+      byId("fTitle").value = point.title;
+      byId("fSystem").value = point.system || "";
+      renderGroupPicker("pointGroupPicker", point.groupIds || []);
+      byId("fArea").value = point.area || "";
+      byId("fOwner").value = point.owner || "";
+      byId("fDue").value = point.due || "";
+      byId("fPriority").value = point.priority;
+      byId("fVerification").value = point.verification || "";
+      byId("fReference").value = point.reference || "";
+      byId("fDecisionRequired").checked = Boolean(point.decisionRequired);
+      byId("fDecisionFrom").value = point.decisionFrom || "";
+      byId("fEscalation").value = point.escalation || "";
+      byId("fNextFollowUp").value = point.nextFollowUp || "";
+      byId("fNote").value = point.note || "";
+      byId("pointAdvanced").open = Boolean(point.decisionRequired || point.decisionFrom || point.escalation || point.nextFollowUp || point.reference);
+      byId("pointModalEyebrow").textContent = "Redigera punkt";
+      byId("pointModalTitle").textContent = point.title;
+      byId("savePointButton").textContent = "Spara ändringar";
+      byId("pointModal").classList.remove("hide");
+      setTimeout(function() { byId("fTitle").focus(); }, 20);
+    }
+
+    function closePointForm() {
+      byId("pointModal").classList.add("hide");
+      resetPointForm();
+      if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
+        lastFocusedElement.focus();
+      }
+    }
+
+    function savePoint(event) {
+      event.preventDefault();
+      var decisionRequired = byId("fDecisionRequired").checked || byId("fStatus").value === "Väntar på beslut";
+      var decisionFrom = byId("fDecisionFrom").value.trim();
+      var escalation = byId("fEscalation").value.trim();
+      byId("fDecisionFrom").setCustomValidity("");
+      if (decisionRequired && !decisionFrom && !escalation) {
+        byId("fDecisionFrom").setCustomValidity("Ange vem som ska fatta beslutet eller vem frågan ska eskaleras till.");
+        byId("fDecisionFrom").reportValidity();
+        return;
+      }
+      var groupIds = selectedGroups("pointGroupPicker");
+      if (!groupIds.length) {
+        showToast("Välj minst en berörd grupp.");
+        return;
+      }
+      var existingId = Number(byId("fId").value);
+      var existingPoint = points.find(function(point) { return point.id === existingId; });
+      var now = new Date().toISOString();
+      var entry = {
+        id: existingId || newId(),
+        type: byId("fType").value,
+        status: byId("fStatus").value,
+        title: byId("fTitle").value.trim(),
+        system: byId("fSystem").value.trim(),
+        area: byId("fArea").value.trim(),
+        owner: byId("fOwner").value.trim(),
+        due: byId("fDue").value,
+        priority: byId("fPriority").value,
+        verification: byId("fVerification").value.trim(),
+        groupIds: groupIds,
+        reference: byId("fReference").value.trim(),
+        decisionRequired: decisionRequired,
+        decisionFrom: decisionFrom,
+        escalation: escalation,
+        nextFollowUp: byId("fNextFollowUp").value,
+        note: byId("fNote").value.trim(),
+        createdAt: existingPoint ? existingPoint.createdAt : now,
+        updatedAt: now,
+        closedAt: byId("fStatus").value === "Klar" ? (existingPoint && existingPoint.closedAt ? existingPoint.closedAt : now) : "",
+        closeNote: existingPoint ? existingPoint.closeNote || "" : ""
+      };
+      if (existingId) {
+        points = points.map(function(point) { return point.id === existingId ? entry : point; });
+      } else {
+        points.unshift(entry);
+      }
+      var sourceLogId = Number(byId("pointForm").dataset.logId);
+      if (sourceLogId) {
+        logEntries = logEntries.map(function(logEntry) {
+          return logEntry.id === sourceLogId ? Object.assign({}, logEntry, {
+            pointId: entry.id,
+            updatedAt: now
+          }) : logEntry;
+        });
+        writeStorage(LOGS_KEY, logEntries);
+      }
+      if (savePoints(existingId ? "Punkten har uppdaterats." : "Punkten har lagts till.")) {
+        closePointForm();
+      }
+    }
+
+    function updatePointDecisionFields() {
+      var waiting = byId("fStatus").value === "Väntar på beslut";
+      if (waiting) {
+        byId("fDecisionRequired").checked = true;
+        byId("pointAdvanced").open = true;
+      }
+    }
+
+    function updatePointStatus(id, status) {
+      points = points.map(function(point) {
+        return point.id === id ? Object.assign({}, point, {
+          status: status,
+          updatedAt: new Date().toISOString(),
+          closedAt: status === "Klar" ? (point.closedAt || new Date().toISOString()) : ""
+        }) : point;
+      });
+      savePoints("Status har uppdaterats.");
+    }
+
+    function removePoint(id) {
+      var point = points.find(function(item) { return item.id === id; });
+      if (!point) {
+        return;
+      }
+      var linked = logEntries.filter(function(entry) { return entry.pointId === id; });
+      var question = "Ta bort punkten ”" + point.title + "”?";
+      if (linked.length) {
+        question += "\n\n" + linked.length + (linked.length === 1 ? " anteckning" : " anteckningar") +
+          " är kopplade till punkten. Anteckningarna behålls men kopplingen tas bort.";
+      }
+      if (window.confirm(question)) {
+        points = points.filter(function(item) { return item.id !== id; });
+        if (linked.length) {
+          logEntries = logEntries.map(function(entry) {
+            return entry.pointId === id ? Object.assign({}, entry, { pointId: 0 }) : entry;
+          });
+          writeStorage(LOGS_KEY, logEntries);
+        }
+        savePoints("Punkten har tagits bort.");
+      }
+    }
+
+    function resetLogForm() {
+      byId("logForm").reset();
+      byId("lId").value = "";
+      byId("lType").value = "Anteckning";
+      byId("lDate").value = localIsoDate();
+      byId("lAuthor").value = "Jonis Awad";
+      byId("lActionPriority").value = "Normal";
+      renderGroupPicker("logGroupPicker", [activeGroup]);
+      renderLogPointOptions();
+      updateLogFormFields();
+      byId("logModalEyebrow").textContent = "Gruppens logg";
+      byId("logModalTitle").textContent = "Ny anteckning";
+      byId("saveLogButton").textContent = "Spara anteckning";
+    }
+
+    function renderLogPointOptions(selectedId) {
+      var selected = Number(selectedId) || 0;
+      byId("lPointId").innerHTML = '<option value="">Ingen koppling</option>' + points.map(function(point) {
+        return '<option value="' + point.id + '" ' + (point.id === selected ? "selected" : "") + '>' +
+          escapeHtml(point.title) + '</option>';
+      }).join("");
+    }
+
+    function updateLogFormFields() {
+      var type = byId("lType").value;
+      document.querySelectorAll(".log-meeting-field").forEach(function(field) {
+        field.classList.toggle("hide", type !== "Möte");
+      });
+      document.querySelectorAll(".log-decision-field").forEach(function(field) {
+        field.classList.toggle("hide", type !== "Beslut");
+      });
+      byId("lDecidedBy").required = type === "Beslut";
+      byId("lDecisionDate").required = type === "Beslut";
+      var actionVisible = byId("lRequiresAction").checked;
+      byId("logActionFields").classList.toggle("hide", !actionVisible);
+      byId("lActionOwner").required = actionVisible;
+      byId("lActionDue").required = actionVisible;
+      byId("lActionVerification").required = actionVisible;
+      byId("logModalTitle").textContent = byId("lId").value ? "Redigera " + type.toLocaleLowerCase("sv-SE") : "Ny " + type.toLocaleLowerCase("sv-SE");
+      byId("saveLogButton").textContent = byId("lId").value ? "Spara ändringar" : "Spara " + type.toLocaleLowerCase("sv-SE");
+    }
+
+    function openLogForm(type) {
+      lastFocusedElement = document.activeElement;
+      resetLogForm();
+      byId("lType").value = type || "Anteckning";
+      updateLogFormFields();
+      byId("logModal").classList.remove("hide");
+      setTimeout(function() { byId("lTitle").focus(); }, 20);
+    }
+
+    function editLogEntry(id) {
+      var entry = logEntries.find(function(item) { return item.id === id; });
+      if (!entry) { return; }
+      lastFocusedElement = document.activeElement;
+      resetLogForm();
+      byId("lId").value = entry.id;
+      byId("lType").value = entry.type;
+      byId("lDate").value = entry.date;
+      renderGroupPicker("logGroupPicker", entry.groupIds);
+      byId("lTitle").value = entry.title || "";
+      byId("lText").value = entry.text || "";
+      byId("lAuthor").value = entry.author || "";
+      renderLogPointOptions(entry.pointId);
+      byId("lParticipants").value = entry.participants || "";
+      byId("lMeetingTime").value = entry.meetingTime || "";
+      byId("lNextMeeting").value = entry.nextMeeting || "";
+      byId("lDecidedBy").value = entry.decidedBy || "";
+      byId("lDecisionDate").value = entry.decisionDate || "";
+      byId("lDecisionOutcome").value = entry.decisionOutcome || "";
+      byId("lPinned").checked = Boolean(entry.pinned);
+      byId("lRequiresAction").checked = false;
+      byId("lActionLabel").classList.add("hide");
+      updateLogFormFields();
+      byId("logModal").classList.remove("hide");
+      setTimeout(function() { byId("lTitle").focus(); }, 20);
+    }
+
+    function closeLogForm() {
+      byId("logModal").classList.add("hide");
+      byId("lActionLabel").classList.remove("hide");
+      resetLogForm();
+      if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
+        lastFocusedElement.focus();
+      }
+    }
+
+    function saveLogEntry(event) {
+      event.preventDefault();
+      var groupIds = selectedGroups("logGroupPicker");
+      if (!groupIds.length) {
+        showToast("Välj minst en berörd grupp.");
+        return;
+      }
+      var existingId = Number(byId("lId").value);
+      var existing = logEntries.find(function(item) { return item.id === existingId; });
+      var now = new Date().toISOString();
+      var pointId = Number(byId("lPointId").value) || 0;
+      var entry = normalizeLogEntry({
+        id: existingId || newId(),
+        type: byId("lType").value,
+        groupIds: groupIds,
+        date: byId("lDate").value,
+        title: byId("lTitle").value.trim(),
+        text: byId("lText").value.trim(),
+        author: byId("lAuthor").value.trim() || "Jonis Awad",
+        pointId: pointId,
+        participants: byId("lParticipants").value.trim(),
+        meetingTime: byId("lMeetingTime").value,
+        nextMeeting: byId("lNextMeeting").value,
+        decidedBy: byId("lDecidedBy").value.trim(),
+        decisionDate: byId("lDecisionDate").value,
+        decisionOutcome: byId("lDecisionOutcome").value,
+        pinned: byId("lPinned").checked,
+        createdAt: existing ? existing.createdAt : now,
+        updatedAt: now
+      });
+
+      if (!existingId && byId("lRequiresAction").checked) {
+        var actionPoint = normalizePoint({
+          id: newId(),
+          type: "Hinder / RFI",
+          title: entry.title,
+          system: groupIds.join(" / "),
+          area: "",
+          owner: byId("lActionOwner").value.trim(),
+          due: byId("lActionDue").value,
+          status: "Ej startad",
+          priority: byId("lActionPriority").value,
+          verification: byId("lActionVerification").value.trim(),
+          groupIds: groupIds,
+          reference: "Skapad från gruppanteckning",
+          decisionRequired: false,
+          decisionFrom: "",
+          escalation: "",
+          nextFollowUp: "",
+          note: entry.text,
+          createdAt: now,
+          updatedAt: now
+        });
+        points.unshift(actionPoint);
+        entry.pointId = actionPoint.id;
+        if (!writeStorage(POINTS_KEY, points)) {
+          return;
+        }
+      }
+
+      if (existingId) {
+        logEntries = logEntries.map(function(item) { return item.id === existingId ? entry : item; });
+      } else {
+        logEntries.unshift(entry);
+      }
+      if (entry.type === "Beslut" && entry.pointId && entry.decisionOutcome) {
+        points = points.map(function(point) {
+          if (point.id !== entry.pointId) { return point; }
+          return Object.assign({}, point, {
+            status: entry.decisionOutcome,
+            decisionRequired: false,
+            updatedAt: now,
+            closedAt: entry.decisionOutcome === "Klar" ? (point.closedAt || now) : ""
+          });
+        });
+        if (!writeStorage(POINTS_KEY, points)) {
+          return;
+        }
+      }
+      if (saveLogs(existingId ? "Loggposten har uppdaterats." : "Loggposten har sparats i gruppen.")) {
+        closeLogForm();
+      }
+    }
+
+    function removeLogEntry(id) {
+      var entry = logEntries.find(function(item) { return item.id === id; });
+      if (entry && window.confirm("Ta bort ”" + entry.title + "” från grupploggen?")) {
+        logEntries = logEntries.filter(function(item) { return item.id !== id; });
+        saveLogs("Loggposten har tagits bort.");
+      }
+    }
+
+    function togglePinnedLog(id) {
+      logEntries = logEntries.map(function(entry) {
+        return entry.id === id ? Object.assign({}, entry, { pinned: !entry.pinned, updatedAt: new Date().toISOString() }) : entry;
+      });
+      saveLogs("Loggpostens placering har uppdaterats.");
+    }
+
+    function createPointFromLog(id) {
+      var entry = logEntries.find(function(item) { return item.id === id; });
+      if (!entry) { return; }
+      openPointForm("Hinder / RFI", entry.groupIds[0] || activeGroup);
+      renderGroupPicker("pointGroupPicker", entry.groupIds);
+      byId("fTitle").value = entry.title;
+      byId("fNote").value = entry.text;
+      byId("fReference").value = "Grupplogg " + niceDate(entry.date);
+      byId("fOwner").value = entry.author || "";
+      byId("fDue").value = dateOffset(7);
+      byId("fVerification").value = "Verifieras vid nästa gruppuppföljning";
+      byId("pointForm").dataset.logId = String(entry.id);
+    }
+
+    function setContactFilter(value) {
+      contactFilter = value;
+      renderContacts();
+    }
+
+    function renderDisciplineGrid() {
+      byId("disciplineGrid").innerHTML = DISCIPLINES.map(function(discipline) {
+        var people = contacts.filter(function(contact) { return contact.discipline === discipline.name; });
+        var names = people.map(function(contact) { return contact.name; }).join(", ");
+        var safeDiscipline = discipline.name.replace(/'/g, "\\'");
+        return '<button type="button" class="discipline-card" onclick="selectGroup(\'' + safeDiscipline + '\');showView(\'groups\')">' +
+          '<div class="discipline-top"><h3>' + escapeHtml(discipline.name) + '</h3><span class="count-badge">' + people.length + '</span></div>' +
+          '<p>' + escapeHtml(discipline.purpose) + '</p>' +
+          '<small>' + (names ? escapeHtml(names) : "Kontakt saknas – lägg till ansvarig") + '</small>' +
+          '</button>';
+      }).join("");
+    }
+
+    function renderContacts() {
+      var filters = ["Alla"].concat(DISCIPLINES.map(function(item) { return item.name; }), ["Övrigt"]);
+      byId("contactFilters").innerHTML = filters.map(function(filter) {
+        var safeFilter = filter.replace(/'/g, "\\'");
+        return '<button type="button" aria-pressed="' + (contactFilter === filter) + '" class="' + (contactFilter === filter ? "active" : "") +
+          '" onclick="setContactFilter(\'' + safeFilter + '\')">' + escapeHtml(filter) + '</button>';
+      }).join("");
+
+      var query = String(byId("contactSearch").value || "").toLocaleLowerCase("sv-SE");
+      var rows = contacts.filter(function(contact) {
+        var matchesDiscipline = contactFilter === "Alla" || contact.discipline === contactFilter;
+        var haystack = [contact.name, contact.company, contact.role, contact.discipline, contact.level, contact.email, contact.phone, contact.note].join(" ").toLocaleLowerCase("sv-SE");
+        return matchesDiscipline && haystack.indexOf(query) !== -1;
+      }).sort(function(a, b) {
+        if (a.key !== b.key) {
+          return a.key ? -1 : 1;
+        }
+        return String(a.name).localeCompare(String(b.name), "sv-SE");
+      });
+
+      byId("contactList").innerHTML = rows.map(function(contact) {
+        var links = [];
+        if (contact.email) {
+          links.push('<a href="mailto:' + escapeAttribute(contact.email) + '">' + escapeHtml(contact.email) + '</a>');
+        }
+        if (contact.phone) {
+          links.push('<a href="tel:' + escapeAttribute(contact.phone.replace(/\s/g, "")) + '">' + escapeHtml(contact.phone) + '</a>');
+        }
+        if (!links.length) {
+          links.push("<span>Kontaktuppgifter saknas</span>");
+        }
+        return '<article class="contact-card">' +
+          '<span class="avatar">' + escapeHtml(contactInitials(contact.name)) + '</span>' +
+          '<div class="contact-main">' +
+          (contact.key ? '<span class="key-label">Nyckelkontakt</span>' : "") +
+          '<strong>' + escapeHtml(contact.name) + '</strong>' +
+          '<small>' + escapeHtml([contact.role, contact.company, contact.discipline, contact.level].filter(Boolean).join(" · ")) + '</small>' +
+          '<div class="contact-links">' + links.join('<span aria-hidden="true">·</span>') + '</div>' +
+          (contact.note ? '<p class="contact-note">' + escapeHtml(contact.note) + '</p>' : "") +
+          '</div>' +
+          '<span class="item-actions"><button class="icon-btn" type="button" title="Redigera" aria-label="Redigera ' +
+          escapeAttribute(contact.name) + '" onclick="editContact(' + contact.id + ')">✎</button>' +
+          '<button class="icon-btn delete" type="button" title="Ta bort" aria-label="Ta bort ' +
+          escapeAttribute(contact.name) + '" onclick="removeContact(' + contact.id + ')">×</button></span>' +
+          '</article>';
+      }).join("") || '<div class="panel empty">Inga kontakter matchar filtret.</div>';
+      renderDisciplineGrid();
+    }
+
+    function resetContactForm() {
+      byId("contactForm").reset();
+      byId("cId").value = "";
+      byId("cDiscipline").value = "Projektledning / Beställare";
+      byId("cLevel").value = "Operativ";
+      byId("contactModalEyebrow").textContent = "Ny kontakt";
+      byId("contactModalTitle").textContent = "Lägg till kontakt";
+      byId("saveContactButton").textContent = "Spara kontakt";
+    }
+
+    function openContactForm(discipline) {
+      lastFocusedElement = document.activeElement;
+      resetContactForm();
+      if (discipline) {
+        byId("cDiscipline").value = discipline;
+      }
+      byId("contactModal").classList.remove("hide");
+      setTimeout(function() { byId("cName").focus(); }, 20);
+    }
+
+    function editContact(id) {
+      var contact = contacts.find(function(item) { return item.id === id; });
+      if (!contact) {
+        return;
+      }
+      lastFocusedElement = document.activeElement;
+      resetContactForm();
+      byId("cId").value = contact.id;
+      byId("cName").value = contact.name || "";
+      byId("cCompany").value = contact.company || "";
+      byId("cRole").value = contact.role || "";
+      byId("cDiscipline").value = contact.discipline || "Övrigt";
+      byId("cLevel").value = contact.level || "Operativ";
+      byId("cEmail").value = contact.email || "";
+      byId("cPhone").value = contact.phone || "";
+      byId("cNote").value = contact.note || "";
+      byId("cKey").checked = Boolean(contact.key);
+      byId("contactModalEyebrow").textContent = "Redigera kontakt";
+      byId("contactModalTitle").textContent = contact.name;
+      byId("saveContactButton").textContent = "Spara ändringar";
+      byId("contactModal").classList.remove("hide");
+      setTimeout(function() { byId("cName").focus(); }, 20);
+    }
+
+    function closeContactForm() {
+      byId("contactModal").classList.add("hide");
+      resetContactForm();
+      if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
+        lastFocusedElement.focus();
+      }
+    }
+
+    function saveContact(event) {
+      event.preventDefault();
+      var existingId = Number(byId("cId").value);
+      var entry = {
+        id: existingId || newId(),
+        name: byId("cName").value.trim(),
+        company: byId("cCompany").value.trim(),
+        role: byId("cRole").value.trim(),
+        discipline: byId("cDiscipline").value,
+        level: byId("cLevel").value,
+        email: byId("cEmail").value.trim(),
+        phone: byId("cPhone").value.trim(),
+        note: byId("cNote").value.trim(),
+        key: byId("cKey").checked
+      };
+      if (existingId) {
+        contacts = contacts.map(function(contact) { return contact.id === existingId ? entry : contact; });
+      } else {
+        contacts.push(entry);
+      }
+      if (saveContacts(existingId ? "Kontakten har uppdaterats." : "Kontakten har lagts till.")) {
+        closeContactForm();
+      }
+    }
+
+    function removeContact(id) {
+      var contact = contacts.find(function(item) { return item.id === id; });
+      if (contact && window.confirm("Ta bort kontakten ”" + contact.name + "”?")) {
+        contacts = contacts.filter(function(item) { return item.id !== id; });
+        saveContacts("Kontakten har tagits bort.");
+      }
+    }
+
+    function staffingRowsForDate(date) {
+      return staffing.filter(function(entry) { return entry.date === date; }).sort(function(a, b) {
+        return a.department.localeCompare(b.department, "sv-SE");
+      });
+    }
+
+    function staffingRowsForToday() {
+      return staffingRowsForDate(localIsoDate());
+    }
+
+    function changeStaffingViewDate(date) {
+      staffingViewDate = isValidIsoDate(date) ? date : localIsoDate();
+      rememberStaffingViewDate();
+      renderStaffing();
+    }
+
+    function goToStaffingToday() {
+      changeStaffingViewDate(localIsoDate());
+    }
+
+    function renderStaffingDepartments(selected) {
+      byId("sDepartment").innerHTML = DISCIPLINES.map(function(group) {
+        return '<option ' + (group.name === selected ? "selected" : "") + '>' + escapeHtml(group.name) + '</option>';
+      }).join("");
+    }
+
+    // Fler tillgängliga än planerat kan vara riktigt när ersättare kallats in,
+    // därför blockeras det inte – men siffrorna flaggas så de kan dubbelkollas.
+    function staffingNumberWarning(row) {
+      if (row.available + row.absent > row.planned) {
+        return "Kontrollera siffrorna: " + row.available + " tillgängliga + " + row.absent +
+          " frånvarande är fler än " + row.planned + " planerade.";
+      }
+      return "";
+    }
+
+    function renderStaffing() {
+      staffingViewDate = safeDate(staffingViewDate);
+      var rows = staffingRowsForDate(staffingViewDate);
+      var planned = rows.reduce(function(total, row) { return total + row.planned; }, 0);
+      var available = rows.reduce(function(total, row) { return total + row.available; }, 0);
+      var absent = rows.reduce(function(total, row) { return total + row.absent; }, 0);
+      var need = rows.reduce(function(total, row) { return total + Math.max(0, row.planned - row.available); }, 0);
+      byId("staffPlanned").textContent = planned;
+      byId("staffAvailable").textContent = available;
+      byId("staffAbsent").textContent = absent;
+      byId("staffNeed").textContent = need;
+      byId("staffingViewDate").value = staffingViewDate;
+      byId("staffingDateLabel").textContent = new Intl.DateTimeFormat("sv-SE", {
+        weekday: "long", day: "numeric", month: "long"
+      }).format(new Date(staffingViewDate + "T12:00:00"));
+      byId("staffingTodayNotice").classList.toggle("hide", staffingViewDate === localIsoDate());
+
+      byId("staffingList").innerHTML = rows.map(function(row) {
+        var shortfall = Math.max(0, row.planned - row.available);
+        var oddNumbers = staffingNumberWarning(row);
+        return '<article class="staffing-card' + (oddNumbers ? " needs-check" : "") + '"><span><strong>' + escapeHtml(row.department) + '</strong><small>' +
+          (row.manager ? "Chef: " + escapeHtml(row.manager) : "Chef saknas") + '</small></span>' +
+          '<span class="staff-number"><b>' + row.planned + '</b><span>Planerade</span></span>' +
+          '<span class="staff-number"><b>' + row.available + '</b><span>Tillgängliga</span></span>' +
+          '<span class="staff-number absent"><b>' + row.absent + '</b><span>Frånvarande</span></span>' +
+          '<span class="staffing-note">' + (shortfall ? '<strong>Behöver ' + shortfall + ' till</strong>' : "<strong>Bemanningen räcker</strong>") +
+          (row.note ? '<small>' + escapeHtml(row.note) + '</small>' : "") +
+          (oddNumbers ? '<small class="check-note">' + escapeHtml(oddNumbers) + '</small>' : "") + '</span>' +
+          '<span class="item-actions"><button class="icon-btn" type="button" aria-label="Redigera bemanning för ' +
+          escapeAttribute(row.department) + '" onclick="editStaffing(' + row.id + ')">✎</button>' +
+          '<button class="icon-btn delete" type="button" aria-label="Ta bort bemanning för ' +
+          escapeAttribute(row.department) + '" onclick="removeStaffing(' + row.id + ')">×</button></span></article>';
+      }).join("") || '<p class="empty">Inga avdelningar är uppdaterade för valt datum. Lägg till El, Ventilation eller den avdelning du ska prata med.</p>';
+    }
+
+    function resetStaffingForm() {
+      byId("staffingForm").reset();
+      clearCustomValidity(byId("staffingForm"));
+      byId("sId").value = "";
+      byId("sDate").value = localIsoDate();
+      renderStaffingDepartments("El");
+      byId("sPlanned").value = 0;
+      byId("sAvailable").value = 0;
+      byId("sAbsent").value = 0;
+      byId("staffingModalEyebrow").textContent = "Daglig bemanning";
+      byId("staffingModalTitle").textContent = "Uppdatera avdelning";
+      byId("saveStaffingButton").textContent = "Spara bemanning";
+    }
+
+    function openStaffingForm() {
+      lastFocusedElement = document.activeElement;
+      resetStaffingForm();
+      renderOwnerOptions();
+      byId("staffingModal").classList.remove("hide");
+      setTimeout(function() { byId("sDepartment").focus(); }, 20);
+    }
+
+    function editStaffing(id) {
+      var row = staffing.find(function(entry) { return entry.id === id; });
+      if (!row) { return; }
+      lastFocusedElement = document.activeElement;
+      resetStaffingForm();
+      renderOwnerOptions();
+      byId("sId").value = row.id;
+      byId("sDate").value = row.date;
+      renderStaffingDepartments(row.department);
+      byId("sManager").value = row.manager || "";
+      byId("sPlanned").value = row.planned;
+      byId("sAvailable").value = row.available;
+      byId("sAbsent").value = row.absent;
+      byId("sNote").value = row.note || "";
+      byId("staffingModalEyebrow").textContent = "Redigera bemanning";
+      byId("staffingModalTitle").textContent = row.department;
+      byId("saveStaffingButton").textContent = "Spara ändringar";
+      byId("staffingModal").classList.remove("hide");
+      setTimeout(function() { byId("sManager").focus(); }, 20);
+    }
+
+    function closeStaffingForm() {
+      byId("staffingModal").classList.add("hide");
+      resetStaffingForm();
+      if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
+        lastFocusedElement.focus();
+      }
+    }
+
+    function saveStaffing(event) {
+      event.preventDefault();
+      var id = Number(byId("sId").value);
+      var entry = normalizeStaffing({
+        id: id || newId(),
+        date: byId("sDate").value,
+        department: byId("sDepartment").value,
+        manager: byId("sManager").value.trim(),
+        planned: byId("sPlanned").value,
+        available: byId("sAvailable").value,
+        absent: byId("sAbsent").value,
+        note: byId("sNote").value.trim(),
+        updatedAt: new Date().toISOString()
+      });
+      clearCustomValidity(byId("staffingForm"));
+      if (entry.absent > entry.planned && entry.planned > 0) {
+        byId("sAbsent").setCustomValidity("Frånvarande kan inte vara fler än planerat antal.");
+        byId("sAbsent").reportValidity();
+        return;
+      }
+      var duplicate = staffing.find(function(row) {
+        return row.id !== id && row.date === entry.date && row.department === entry.department;
+      });
+      if (duplicate) {
+        if (id && !window.confirm(entry.department + " är redan uppdaterad för " + niceDate(entry.date) +
+          ".\n\nVill du slå ihop raderna? Den befintliga radens siffror ersätts med dina nya och den gamla raden tas bort.")) {
+          return;
+        }
+        entry.id = duplicate.id;
+        staffing = staffing.filter(function(row) {
+          return !id || row.id !== id;
+        }).map(function(row) { return row.id === duplicate.id ? entry : row; });
+      } else if (id) {
+        staffing = staffing.map(function(row) { return row.id === id ? entry : row; });
+      } else {
+        staffing.push(entry);
+      }
+      staffingViewDate = entry.date;
+      rememberStaffingViewDate();
+      if (persistStaffing("Bemanningen har sparats och visas för " + niceDate(entry.date) + ".")) {
+        closeStaffingForm();
+      }
+    }
+
+    function removeStaffing(id) {
+      var row = staffing.find(function(entry) { return entry.id === id; });
+      if (row && window.confirm("Ta bort bemanning för " + row.department + "?")) {
+        staffing = staffing.filter(function(entry) { return entry.id !== id; });
+        persistStaffing("Bemanningen har tagits bort.");
+      }
+    }
+
+    function staffingSummaryText() {
+      var rows = staffingRowsForDate(staffingViewDate);
+      if (!rows.length) {
+        return "Bemanning " + staffingViewDate + ": inga avdelningar uppdaterade.";
+      }
+      return "Bemanning " + staffingViewDate + ":\n" + rows.map(function(row) {
+        var missing = Math.max(0, row.planned - row.available);
+        return row.department + ": " + row.available + "/" + row.planned + " tillgängliga, " +
+          row.absent + " frånvarande" + (missing ? ", saknar " + missing : "") +
+          (row.note ? ". " + row.note : "");
+      }).join("\n");
+    }
+
+    async function copyStaffingSummary() {
+      var text = staffingSummaryText();
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast("Bemanningsläget har kopierats.");
+      } catch (error) {
+        window.prompt("Kopiera texten här:", text);
+      }
+    }
+
+    function renderReport() {
+      var open = points.filter(function(point) { return point.status !== "Klar"; }).sort(pointSort);
+      var done = points.filter(function(point) { return point.status === "Klar"; });
+      var critical = open.filter(function(point) { return point.priority === "Kritisk"; });
+      var waiting = open.filter(function(point) { return point.status === "Väntar på beslut" || point.decisionRequired; });
+      var keyContacts = contacts.filter(function(contact) { return contact.key; });
+      var managerCalls = getManagerCalls();
+      var weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      var weekAgoIso = localIsoDate(weekAgo);
+      var decisions = logEntries.filter(function(entry) {
+        return entry.type === "Beslut" && entry.date >= weekAgoIso && entry.date <= localIsoDate();
+      }).sort(function(a, b) { return b.date.localeCompare(a.date); });
+      var meetings = logEntries.filter(function(entry) {
+        var meetingDate = meetingScheduleDate(entry);
+        return entry.type === "Möte" && meetingDate >= localIsoDate() && meetingDate <= dateOffset(14);
+      }).sort(function(a, b) { return meetingScheduleDate(a).localeCompare(meetingScheduleDate(b)); });
+
+      byId("reportDate").textContent = localIsoDate();
+      byId("rOpen").textContent = open.length;
+      byId("rCritical").textContent = critical.length;
+      byId("rWaiting").textContent = waiting.length;
+      byId("rDone").textContent = done.length;
+
+      byId("reportOpen").innerHTML = open.slice(0, 7).map(function(point) {
+        return '<div class="report-line"><strong>' + escapeHtml(point.title) + '</strong><small>' +
+          escapeHtml(point.system || "System saknas") + " · " + escapeHtml(point.area || "Område saknas") +
+          " · Ansvarig: " + escapeHtml(point.owner || "ej utsedd") + " · Klart: " + niceDate(point.due) +
+          (point.verification ? " · Verifiering: " + escapeHtml(point.verification) : "") +
+          (point.reference ? " · Referens: " + escapeHtml(point.reference) : "") +
+          '</small></div>';
+      }).join("") || "<p>Inga öppna punkter.</p>";
+
+      byId("reportWaiting").innerHTML = waiting.map(function(point) {
+        return '<div class="report-line"><strong>' + escapeHtml(point.title) + '</strong><small>' +
+          escapeHtml(point.note || "Komplettera med vilket beslut som behövs.") +
+          " · Ansvarig: " + escapeHtml(point.owner || "ej utsedd") + '</small></div>';
+      }).join("") || "<p>Inga punkter väntar på beslut.</p>";
+
+      byId("reportManagerCalls").innerHTML = managerCalls.map(function(call) {
+        return '<div class="report-line"><strong>' + escapeHtml(call.target) + '</strong><small>' +
+          escapeHtml(call.point.title) +
+          (call.point.escalation ? " · Eskalering: " + escapeHtml(call.point.escalation) : "") +
+          (call.point.nextFollowUp ? " · Följ upp: " + niceDate(call.point.nextFollowUp) : "") +
+          '</small></div>';
+      }).join("") || "<p>Inga chefsbeslut eller eskaleringar är registrerade.</p>";
+
+      byId("reportContacts").innerHTML = keyContacts.map(function(contact) {
+        return '<div class="report-line"><strong>' + escapeHtml(contact.name) + '</strong><small>' +
+          escapeHtml([contact.role, contact.company, contact.discipline, contact.level].filter(Boolean).join(" · ")) +
+          (contact.phone ? " · " + escapeHtml(contact.phone) : "") +
+          (contact.email ? " · " + escapeHtml(contact.email) : "") +
+          '</small></div>';
+      }).join("") || "<p>Markera kontakter som nyckelkontakter för att visa dem här.</p>";
+
+      byId("reportDecisions").innerHTML = decisions.map(function(entry) {
+        return '<div class="report-line"><strong>' + escapeHtml(entry.title) + '</strong><small>' +
+          escapeHtml(entry.text) + " · " + niceDate(entry.decisionDate || entry.date) +
+          (entry.decidedBy ? " · Beslutad av: " + escapeHtml(entry.decidedBy) : "") +
+          (entry.decisionOutcome ? " · Punktstatus: " + escapeHtml(entry.decisionOutcome) : "") +
+          " · " + escapeHtml(entry.groupIds.join(", ")) + '</small></div>';
+      }).join("") || "<p>Inga beslut är registrerade den här veckan.</p>";
+
+      byId("reportMeetings").innerHTML = meetings.map(function(entry) {
+        return '<div class="report-line"><strong>' + escapeHtml(entry.title) + '</strong><small>' +
+          niceDate(meetingScheduleDate(entry)) + (entry.meetingTime ? " kl. " + escapeHtml(entry.meetingTime) : "") +
+          " · " + escapeHtml(entry.groupIds.join(", ")) +
+          (entry.participants ? " · Deltagare: " + escapeHtml(entry.participants) : "") +
+          '</small></div>';
+      }).join("") || "<p>Inga kommande möten är registrerade.</p>";
+
+      var staffingToday = staffingRowsForToday();
+      var staffingPlanned = staffingToday.reduce(function(total, row) { return total + row.planned; }, 0);
+      var staffingAvailable = staffingToday.reduce(function(total, row) { return total + row.available; }, 0);
+      var staffingShortfall = staffingToday.reduce(function(total, row) { return total + Math.max(0, row.planned - row.available); }, 0);
+      byId("reportStaffing").innerHTML = staffingToday.length
+        ? '<div class="report-line"><strong>Totalt ' + staffingAvailable + " av " + staffingPlanned +
+            " planerade på plats</strong><small>" + niceDate(localIsoDate()) +
+            (staffingShortfall ? " · Saknas mot plan: " + staffingShortfall : " · Bemanningen räcker") +
+            "</small></div>" +
+          staffingToday.map(function(row) {
+            var missing = Math.max(0, row.planned - row.available);
+            return '<div class="report-line"><strong>' + escapeHtml(row.department) + '</strong><small>' +
+              row.available + " av " + row.planned + " tillgängliga · " + row.absent + " frånvarande" +
+              (missing ? " · saknar " + missing : "") +
+              (row.manager ? " · Chef: " + escapeHtml(row.manager) : "") +
+              (row.note ? " · " + escapeHtml(row.note) : "") +
+              "</small></div>";
+          }).join("")
+        : "<p>Ingen avdelning är uppdaterad för idag.</p>";
+
+      byId("reportGroups").innerHTML = disciplineNames().map(function(group) {
+        var groupOpen = open.filter(function(point) { return pointBelongsToGroup(point, group); });
+        var groupWaiting = groupOpen.filter(function(point) { return point.status === "Väntar på beslut"; });
+        var latestNote = logEntries.filter(function(entry) {
+          return entry.groupIds.indexOf(group) !== -1;
+        }).sort(function(a, b) { return String(b.date + b.createdAt).localeCompare(String(a.date + a.createdAt)); })[0];
+        if (!groupOpen.length && !latestNote) {
+          return "";
+        }
+        return '<div class="report-line"><strong>' + escapeHtml(group) + '</strong><small>' +
+          groupOpen.length + " öppna · " + groupWaiting.length + " väntar på beslut" +
+          (latestNote ? " · Senaste: " + escapeHtml(latestNote.title) : "") +
+          '</small></div>';
+      }).join("") || "<p>Ingen gruppaktivitet är registrerad.</p>";
+    }
+
+    function csvCell(value) {
+      var text = String(value || "");
+      if (/^[=+\-@]/.test(text)) {
+        text = "'" + text;
+      }
+      return '"' + text.replace(/"/g, '""') + '"';
+    }
+
+    function downloadCsv(rows, filename) {
+      var csv = rows.map(function(row) { return row.map(csvCell).join(";"); }).join("\r\n");
+      downloadBlob(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" }), filename);
+    }
+
+    function downloadBlob(blob, filename) {
+      var blobUrl = URL.createObjectURL(blob);
+      var link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 1000);
+    }
+
+    function exportBackup() {
+      var backup = {
+        version: 2,
+        project: "EcoDataCenter Borlänge",
+        exportedAt: new Date().toISOString(),
+        points: points,
+        contacts: contacts,
+        logEntries: logEntries,
+        staffing: staffing
+      };
+      downloadBlob(
+        new Blob([JSON.stringify(backup, null, 2)], { type: "application/json;charset=utf-8" }),
+        "installationssamordning-sakerhetskopia-" + localIsoDate() + ".json"
+      );
+      writeStorage(BACKUP_DATE_KEY, localIsoDate());
+      renderBackupStatus();
+      showToast("Säkerhetskopian har sparats.");
+    }
+
+    async function importBackup(event) {
+      var input = event.target;
+      var file = input.files && input.files[0];
+      if (!file) {
+        return;
+      }
+      try {
+        var backup = JSON.parse(await file.text());
+        if (!backup || !Array.isArray(backup.points) || !Array.isArray(backup.contacts)) {
+          throw new Error("Ogiltigt format");
+        }
+        if (!window.confirm("Återställ säkerhetskopian? Nuvarande punkter, kontakter, gruppanteckningar och bemanning ersätts.")) {
+          return;
+        }
+        var restoredPoints = ensureUniqueIds(backup.points.map(normalizePoint));
+        var restoredContacts = ensureUniqueIds(backup.contacts.map(normalizeContact));
+        var restoredLogs = ensureUniqueIds(Array.isArray(backup.logEntries) ? backup.logEntries.map(normalizeLogEntry) : []);
+        var restoredStaffing = ensureUniqueIds(Array.isArray(backup.staffing) ? backup.staffing.map(normalizeStaffing) : []);
+        reserveIdSeed(restoredPoints);
+        reserveIdSeed(restoredContacts);
+        reserveIdSeed(restoredLogs);
+        reserveIdSeed(restoredStaffing);
+        if (writeStorage(POINTS_KEY, restoredPoints) && writeStorage(CONTACTS_KEY, restoredContacts) && writeStorage(LOGS_KEY, restoredLogs) && writeStorage(STAFFING_KEY, restoredStaffing)) {
+          points = restoredPoints;
+          contacts = restoredContacts;
+          logEntries = restoredLogs;
+          staffing = restoredStaffing;
+          renderAll();
+          showToast("Säkerhetskopian har återställts.");
+        }
+      } catch (error) {
+        showToast("Filen kunde inte återställas. Välj en säkerhetskopia från verktyget.");
+      } finally {
+        input.value = "";
+      }
+    }
+
+    function exportPointsCsv() {
+      var rows = [
+        ["Typ", "Rubrik", "Grupper", "System", "Område", "Ansvarig", "Klart datum", "Status", "Prioritet", "Verifiering", "Referens", "Beslut krävs", "Beslut från", "Eskaleras till", "Nästa uppföljning", "Anteckning"]
+      ].concat(points.map(function(point) {
+        return [point.type, point.title, point.groupIds.join(", "), point.system, point.area, point.owner, point.due, point.status, point.priority, point.verification, point.reference, point.decisionRequired ? "Ja" : "Nej", point.decisionFrom, point.escalation, point.nextFollowUp, point.note];
+      }));
+      downloadCsv(rows, "installationssamordning-" + localIsoDate() + ".csv");
+      showToast("Samordningspunkterna har exporterats.");
+    }
+
+    function exportContactsCsv() {
+      var rows = [
+        ["Namn", "Företag / avdelning", "Roll", "Disciplin", "Kontaktnivå", "E-post", "Telefon", "Ansvarsområde", "Nyckelkontakt"]
+      ].concat(contacts.map(function(contact) {
+        return [contact.name, contact.company, contact.role, contact.discipline, contact.level, contact.email, contact.phone, contact.note, contact.key ? "Ja" : "Nej"];
+      }));
+      downloadCsv(rows, "kontaktlista-" + localIsoDate() + ".csv");
+      showToast("Kontaktlistan har exporterats.");
+    }
+
+    function exportStaffingCsv() {
+      var rows = [
+        ["Datum", "Avdelning", "Avdelningschef", "Planerade", "Tillgängliga", "Frånvarande", "Saknas mot plan", "Notering"]
+      ].concat(staffing.slice().sort(function(a, b) {
+        return (b.date + b.department).localeCompare(a.date + a.department, "sv-SE");
+      }).map(function(row) {
+        return [row.date, row.department, row.manager, row.planned, row.available, row.absent, Math.max(0, row.planned - row.available), row.note];
+      }));
+      downloadCsv(rows, "bemanning-" + localIsoDate() + ".csv");
+      showToast("Bemanningen har exporterats.");
+    }
+
+    function exportGroupLogCsv() {
+      var rows = [
+        ["Typ", "Datum", "Rubrik", "Anteckning / beslut", "Grupper", "Skapad av", "Deltagare", "Mötestid", "Nästa möte", "Beslutad av", "Beslutsdatum", "Punktstatus efter beslut", "Kopplad punkt"]
+      ].concat(logEntries.filter(function(entry) {
+        return entry.groupIds.indexOf(activeGroup) !== -1;
+      }).map(function(entry) {
+        var linked = points.find(function(point) { return point.id === entry.pointId; });
+        return [entry.type, entry.date, entry.title, entry.text, entry.groupIds.join(", "), entry.author, entry.participants, entry.meetingTime, entry.nextMeeting, entry.decidedBy, entry.decisionDate, entry.decisionOutcome, linked ? linked.title : ""];
+      }));
+      downloadCsv(rows, "grupplogg-" + activeGroup.replace(/[^a-z0-9åäö]+/gi, "-").toLocaleLowerCase("sv-SE") + "-" + localIsoDate() + ".csv");
+      showToast("Grupploggen har exporterats.");
+    }
+
+    function renderAll() {
+      renderOverview();
+      renderPointList();
+      renderGroups();
+      renderStaffing();
+      renderContacts();
+      renderReport();
+      renderOwnerOptions();
+      renderBackupStatus();
+    }
+
+    function renderBackupStatus() {
+      var lastBackup = readStorage(BACKUP_DATE_KEY, "");
+      var text = lastBackup ? "Senaste säkerhetskopia: " + niceDate(lastBackup) : "Säkerhetskopia har inte skapats ännu";
+      byId("backupStatus").textContent = text;
+      byId("backupStatusPanel").textContent = text;
+    }
+
+    function clearCustomValidity(form) {
+      if (!form) {
+        return;
+      }
+      Array.prototype.forEach.call(form.elements, function(element) {
+        if (typeof element.setCustomValidity === "function") {
+          element.setCustomValidity("");
+        }
+      });
+    }
+
+    // Webbläsaren stoppar submit innan formulärets sparfunktion hinner köra, så ett
+    // kvarliggande setCustomValidity-meddelande låser formuläret permanent.
+    // Meddelandet måste därför rensas så snart användaren ändrar något.
+    document.addEventListener("input", function(event) {
+      clearCustomValidity(event.target && event.target.form);
+    });
+
+    document.addEventListener("change", function(event) {
+      clearCustomValidity(event.target && event.target.form);
+    });
+
+    var MODAL_IDS = ["pointModal", "contactModal", "staffingModal", "logModal"];
+
+    function openModal() {
+      var found = null;
+      MODAL_IDS.forEach(function(id) {
+        if (!found && !byId(id).classList.contains("hide")) {
+          found = byId(id);
+        }
+      });
+      return found;
+    }
+
+    // Utan fokusfälla vandrar tabb-fokus vidare till knapparna bakom dialogen,
+    // vilket gör formulären svåra att använda med enbart tangentbord.
+    document.addEventListener("keydown", function(event) {
+      if (event.key !== "Tab") {
+        return;
+      }
+      var modal = openModal();
+      if (!modal) {
+        return;
+      }
+      var focusable = Array.from(modal.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])'
+      )).filter(function(element) {
+        return element.offsetParent !== null || element === document.activeElement;
+      });
+      if (!focusable.length) {
+        return;
+      }
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      } else if (!modal.contains(document.activeElement)) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "Escape") {
+        if (!byId("pointModal").classList.contains("hide")) {
+          closePointForm();
+        } else if (!byId("contactModal").classList.contains("hide")) {
+          closeContactForm();
+        } else if (!byId("staffingModal").classList.contains("hide")) {
+          closeStaffingForm();
+        } else if (!byId("logModal").classList.contains("hide")) {
+          closeLogForm();
+        }
+      }
+    });
+
+    window.addEventListener("storage", function(event) {
+      try {
+        if (event.key === POINTS_KEY && event.newValue) {
+          points = ensureUniqueIds(JSON.parse(event.newValue).map(normalizePoint));
+          renderAll();
+          showToast("Punkterna uppdaterades från en annan flik.");
+        }
+        if (event.key === CONTACTS_KEY && event.newValue) {
+          contacts = ensureUniqueIds(JSON.parse(event.newValue).map(normalizeContact));
+          renderAll();
+          showToast("Kontakterna uppdaterades från en annan flik.");
+        }
+        if (event.key === LOGS_KEY && event.newValue) {
+          logEntries = ensureUniqueIds(JSON.parse(event.newValue).map(normalizeLogEntry));
+          renderAll();
+          showToast("Gruppanteckningarna uppdaterades från en annan flik.");
+        }
+        if (event.key === STAFFING_KEY && event.newValue) {
+          staffing = ensureUniqueIds(JSON.parse(event.newValue).map(normalizeStaffing));
+          renderAll();
+          showToast("Bemanningen uppdaterades från en annan flik.");
+        }
+      } catch (error) {
+        showToast("En uppdatering från en annan flik kunde inte läsas.");
+      }
+    });
+
+    byId("todayLabel").textContent = new Intl.DateTimeFormat("sv-SE", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }).format(new Date());
+
+    renderAll();
+  </script>
+</body>
+</html>
